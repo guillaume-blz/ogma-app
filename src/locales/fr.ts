@@ -32,6 +32,12 @@ export default {
     closeLeft: "Fermer les onglets à gauche",
     closeRight: "Fermer les onglets à droite",
   },
+  sources: {
+    subtitle: "Gérez vos connexions de données",
+    new: "Nouvelle source",
+    loading: "Chargement…",
+    empty: "Aucune source. Ajoutez votre première connexion.",
+  },
   shortcuts: {
     commandPalette: "Palette de commandes",
     closeTab: "Fermer l'onglet",

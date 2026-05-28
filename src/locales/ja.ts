@@ -32,6 +32,12 @@ export default {
     closeLeft: "左のタブを閉じる",
     closeRight: "右のタブを閉じる",
   },
+  sources: {
+    subtitle: "データ接続を管理",
+    new: "新しいソース",
+    loading: "読み込み中…",
+    empty: "ソースがありません。最初の接続を追加してください。",
+  },
   shortcuts: {
     commandPalette: "コマンドパレット",
     closeTab: "タブを閉じる",

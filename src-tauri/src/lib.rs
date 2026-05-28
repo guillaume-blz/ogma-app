@@ -1,4 +1,11 @@
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+mod db;
+mod state;
+mod sources;
+
+use tauri::Manager;
+
+use sources::commands::*;
+
 #[tauri::command]
 fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
@@ -9,7 +16,22 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
-        .invoke_handler(tauri::generate_handler![greet])
+        .setup(|app| {
+            let db = tauri::async_runtime::block_on(db::init(app.handle()))
+                .expect("failed to initialize database");
+            app.manage(state::AppState { db });
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            greet,
+            source_list,
+            source_create,
+            source_update,
+            source_delete,
+            source_test,
+            source_schema,
+            source_query,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

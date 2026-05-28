@@ -32,6 +32,12 @@ export default {
     closeLeft: "Close tabs to the left",
     closeRight: "Close tabs to the right",
   },
+  sources: {
+    subtitle: "Manage your data connections",
+    new: "New source",
+    loading: "Loading…",
+    empty: "No sources yet. Add your first connection.",
+  },
   shortcuts: {
     commandPalette: "Command palette",
     closeTab: "Close tab",
