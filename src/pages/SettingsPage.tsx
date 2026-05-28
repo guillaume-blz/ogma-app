@@ -3,6 +3,8 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { PageHeader } from "@/components/PageHeader";
 import { SettingsSection } from "@/components/SettingsSection";
 import { SettingsRow } from "@/components/SettingsRow";
+import { ThemeModeToggle } from "@/components/ThemeModeToggle";
+import { ThemeSelect } from "@/components/ThemeSelect";
 import {
   Select,
   SelectContent,
@@ -52,6 +54,27 @@ export function SettingsPage() {
         title={t("settings.title")}
         subtitle={t("settings.subtitle")}
       />
+
+      <SettingsSection title={t("settings.appearance.sectionTitle")}>
+        <SettingsRow
+          label={t("settings.appearance.mode.label")}
+          description={t("settings.appearance.mode.description")}
+        >
+          <ThemeModeToggle />
+        </SettingsRow>
+        <SettingsRow
+          label={t("settings.appearance.lightTheme.label")}
+          description={t("settings.appearance.lightTheme.description")}
+        >
+          <ThemeSelect type="light" />
+        </SettingsRow>
+        <SettingsRow
+          label={t("settings.appearance.darkTheme.label")}
+          description={t("settings.appearance.darkTheme.description")}
+        >
+          <ThemeSelect type="dark" />
+        </SettingsRow>
+      </SettingsSection>
 
       <SettingsSection title={t("settings.language.sectionTitle")}>
         <SettingsRow

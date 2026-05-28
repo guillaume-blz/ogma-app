@@ -40,5 +40,20 @@ export default {
       label: "Langue de l'interface",
       description: "Choisissez la langue d'affichage",
     },
+    appearance: {
+      sectionTitle: "Apparence",
+      mode: {
+        label: "Mode de couleur",
+        description: "Clair, sombre ou selon la préférence système",
+      },
+      lightTheme: {
+        label: "Thème clair",
+        description: "Thème utilisé en mode clair",
+      },
+      darkTheme: {
+        label: "Thème sombre",
+        description: "Thème utilisé en mode sombre",
+      },
+    },
   },
 } as const;

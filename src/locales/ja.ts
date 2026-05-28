@@ -40,5 +40,20 @@ export default {
       label: "インターフェース言語",
       description: "表示言語を選択",
     },
+    appearance: {
+      sectionTitle: "外観",
+      mode: {
+        label: "カラーモード",
+        description: "ライト、ダーク、またはシステム設定に従う",
+      },
+      lightTheme: {
+        label: "ライトテーマ",
+        description: "ライトモードで使用するテーマ",
+      },
+      darkTheme: {
+        label: "ダークテーマ",
+        description: "ダークモードで使用するテーマ",
+      },
+    },
   },
 } as const;

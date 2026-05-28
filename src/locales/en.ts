@@ -40,5 +40,20 @@ export default {
       label: "Interface language",
       description: "Choose the display language",
     },
+    appearance: {
+      sectionTitle: "Appearance",
+      mode: {
+        label: "Color mode",
+        description: "Light, dark, or follow system preference",
+      },
+      lightTheme: {
+        label: "Light theme",
+        description: "Theme used in light mode",
+      },
+      darkTheme: {
+        label: "Dark theme",
+        description: "Theme used in dark mode",
+      },
+    },
   },
 } as const;
