@@ -32,4 +32,13 @@ export default {
     closeLeft: "Close tabs to the left",
     closeRight: "Close tabs to the right",
   },
+  settings: {
+    title: "Settings",
+    subtitle: "Manage your preferences",
+    language: {
+      sectionTitle: "Language",
+      label: "Interface language",
+      description: "Choose the display language",
+    },
+  },
 } as const;

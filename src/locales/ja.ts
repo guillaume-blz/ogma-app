@@ -32,4 +32,13 @@ export default {
     closeLeft: "左のタブを閉じる",
     closeRight: "右のタブを閉じる",
   },
+  settings: {
+    title: "設定",
+    subtitle: "設定を管理",
+    language: {
+      sectionTitle: "言語",
+      label: "インターフェース言語",
+      description: "表示言語を選択",
+    },
+  },
 } as const;

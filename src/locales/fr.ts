@@ -32,4 +32,13 @@ export default {
     closeLeft: "Fermer les onglets à gauche",
     closeRight: "Fermer les onglets à droite",
   },
+  settings: {
+    title: "Paramètres",
+    subtitle: "Gérez vos préférences",
+    language: {
+      sectionTitle: "Langue",
+      label: "Langue de l'interface",
+      description: "Choisissez la langue d'affichage",
+    },
+  },
 } as const;
