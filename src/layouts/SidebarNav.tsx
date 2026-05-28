@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { MenuItem } from "@/components/MenuItem";
 import { MenuTitle } from "@/components/MenuTitle";
+import { WorkspaceSwitcher } from "@/components/WorkspaceSwitcher";
 
 interface NavItem {
   id: string;
@@ -65,21 +66,24 @@ export function SidebarNav() {
   const [activeId, setActiveId] = useState("home");
 
   return (
-    <nav className="flex flex-col gap-0.5 p-2 overflow-y-auto flex-1">
-      {navigation.map((section, i) => (
-        <div key={i}>
-          {section.title && <MenuTitle label={section.title} />}
-          {section.items.map((item) => (
-            <MenuItem
-              key={item.id}
-              icon={item.icon}
-              label={item.label}
-              active={activeId === item.id}
-              onClick={() => setActiveId(item.id)}
-            />
-          ))}
-        </div>
-      ))}
-    </nav>
+    <div className="flex flex-col h-full">
+      <nav className="flex flex-col gap-0.5 p-2 overflow-y-auto flex-1">
+        {navigation.map((section, i) => (
+          <div key={i}>
+            {section.title && <MenuTitle label={section.title} />}
+            {section.items.map((item) => (
+              <MenuItem
+                key={item.id}
+                icon={item.icon}
+                label={item.label}
+                active={activeId === item.id}
+                onClick={() => setActiveId(item.id)}
+              />
+            ))}
+          </div>
+        ))}
+      </nav>
+      <WorkspaceSwitcher />
+    </div>
   );
 }
