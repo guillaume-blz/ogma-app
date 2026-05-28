@@ -32,6 +32,12 @@ export default {
     closeLeft: "Fermer les onglets à gauche",
     closeRight: "Fermer les onglets à droite",
   },
+  shortcuts: {
+    commandPalette: "Palette de commandes",
+    closeTab: "Fermer l'onglet",
+    newTab: "Nouvel onglet",
+    openSettings: "Paramètres",
+  },
   settings: {
     title: "Paramètres",
     subtitle: "Gérez vos préférences",

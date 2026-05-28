@@ -32,6 +32,12 @@ export default {
     closeLeft: "左のタブを閉じる",
     closeRight: "右のタブを閉じる",
   },
+  shortcuts: {
+    commandPalette: "コマンドパレット",
+    closeTab: "タブを閉じる",
+    newTab: "新しいタブ",
+    openSettings: "設定",
+  },
   settings: {
     title: "設定",
     subtitle: "設定を管理",

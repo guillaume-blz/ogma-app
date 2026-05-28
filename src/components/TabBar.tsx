@@ -31,6 +31,7 @@ export function TabBar() {
       {
         icon: X,
         label: t("tabs.close"),
+        shortcutId: "close-tab",
         onClick: () => closeTabById(tab),
       },
       {

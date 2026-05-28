@@ -8,9 +8,11 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 import { useTheme } from "@/hooks/useTheme";
+import { useShortcutInit } from "@/hooks/useShortcutInit";
 
 export function AppLayout() {
   useTheme();
+  useShortcutInit();
 
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">

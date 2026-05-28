@@ -2,12 +2,15 @@ import type { ReactNode } from "react";
 import { ContextMenu } from "@base-ui/react/context-menu";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ShortcutBadge } from "@/components/ShortcutBadge";
+import type { ShortcutId } from "@/shortcuts";
 
 export interface PopupMenuItemConfig {
   icon?: LucideIcon;
   label: string;
   onClick: () => void;
   disabled?: boolean;
+  shortcutId?: ShortcutId;
 }
 
 interface PopupMenuProps {
@@ -39,7 +42,10 @@ export function PopupMenu({ children, items }: PopupMenuProps) {
                 <span className="flex h-4 w-4 shrink-0 items-center justify-center">
                   {item.icon && <item.icon className="h-4 w-4" />}
                 </span>
-                <span>{item.label}</span>
+                <span className="flex-1">{item.label}</span>
+                {item.shortcutId && (
+                  <ShortcutBadge id={item.shortcutId} />
+                )}
               </ContextMenu.Item>
             ))}
           </ContextMenu.Popup>

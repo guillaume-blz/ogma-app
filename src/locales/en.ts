@@ -32,6 +32,12 @@ export default {
     closeLeft: "Close tabs to the left",
     closeRight: "Close tabs to the right",
   },
+  shortcuts: {
+    commandPalette: "Command palette",
+    closeTab: "Close tab",
+    newTab: "New tab",
+    openSettings: "Settings",
+  },
   settings: {
     title: "Settings",
     subtitle: "Manage your preferences",
