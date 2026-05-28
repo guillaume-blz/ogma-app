@@ -27,4 +27,9 @@ export default {
     maximize: "Agrandir",
     close: "Fermer",
   },
+  tabs: {
+    close: "Fermer l'onglet",
+    closeLeft: "Fermer les onglets à gauche",
+    closeRight: "Fermer les onglets à droite",
+  },
 } as const;

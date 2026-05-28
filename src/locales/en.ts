@@ -27,4 +27,9 @@ export default {
     maximize: "Maximize",
     close: "Close",
   },
+  tabs: {
+    close: "Close tab",
+    closeLeft: "Close tabs to the left",
+    closeRight: "Close tabs to the right",
+  },
 } as const;

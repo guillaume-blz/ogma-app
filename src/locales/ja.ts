@@ -27,4 +27,9 @@ export default {
     maximize: "最大化",
     close: "閉じる",
   },
+  tabs: {
+    close: "タブを閉じる",
+    closeLeft: "左のタブを閉じる",
+    closeRight: "右のタブを閉じる",
+  },
 } as const;
