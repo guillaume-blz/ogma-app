@@ -2,6 +2,7 @@
 
 
 ## Règles
+- Principe DRY et TDD
 - Tous les commentaires doivent être rédigés en anglais
 - Utiliser les design patterns quand c'est possible
 - Minimiser la répétition

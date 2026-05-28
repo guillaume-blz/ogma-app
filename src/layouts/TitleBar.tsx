@@ -1,12 +1,20 @@
+import { type MouseEvent } from "react";
 import { X, Minus, Square } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 export function TitleBar() {
   const appWindow = getCurrentWindow();
 
+  const onDragStart = (e: MouseEvent) => {
+    if (e.target === e.currentTarget || (e.target as HTMLElement).dataset.tauriDragRegion !== undefined) {
+      appWindow.startDragging();
+    }
+  };
+
   return (
     <header
       data-tauri-drag-region
+      onMouseDown={onDragStart}
       className="flex h-9 shrink-0 items-center justify-between bg-titlebar border-b border-border select-none"
     >
       <div

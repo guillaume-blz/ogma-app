@@ -1,14 +1,9 @@
 import { AppLayout } from "./layouts/AppLayout";
+import { SidebarNav } from "./layouts/SidebarNav";
 
 function App() {
   return (
-    <AppLayout
-      sidebar={
-        <div className="p-3">
-          <p className="text-xs text-muted-foreground">Navigation</p>
-        </div>
-      }
-    >
+    <AppLayout sidebar={<SidebarNav />}>
       <p className="text-sm text-muted-foreground">Main content</p>
     </AppLayout>
   );

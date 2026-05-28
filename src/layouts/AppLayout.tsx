@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { TitleBar } from "./TitleBar";
 import { Sidebar } from "./Sidebar";
 import { MainContent } from "./MainContent";
+import { WindowResizeEdges } from "./WindowResizeEdges";
 import {
   ResizablePanelGroup,
   ResizableHandle,
@@ -15,6 +16,7 @@ interface AppLayoutProps {
 export function AppLayout({ sidebar, children }: AppLayoutProps) {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden">
+      <WindowResizeEdges />
       <TitleBar />
       <ResizablePanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
         <Sidebar>{sidebar}</Sidebar>
