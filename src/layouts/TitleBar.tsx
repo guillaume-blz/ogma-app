@@ -1,9 +1,11 @@
 import { type MouseEvent } from "react";
 import { X, Minus, Square } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { useTranslation } from "react-i18next";
 
 export function TitleBar() {
   const appWindow = getCurrentWindow();
+  const { t } = useTranslation();
 
   const onDragStart = (e: MouseEvent) => {
     if (e.target === e.currentTarget || (e.target as HTMLElement).dataset.tauriDragRegion !== undefined) {
@@ -30,21 +32,21 @@ export function TitleBar() {
         <button
           onClick={() => appWindow.minimize()}
           className="flex h-full w-11 items-center justify-center text-titlebar-foreground hover:bg-border/60 transition-colors"
-          aria-label="Minimize"
+          aria-label={t("window.minimize")}
         >
           <Minus className="h-3.5 w-3.5" />
         </button>
         <button
           onClick={() => appWindow.toggleMaximize()}
           className="flex h-full w-11 items-center justify-center text-titlebar-foreground hover:bg-border/60 transition-colors"
-          aria-label="Maximize"
+          aria-label={t("window.maximize")}
         >
           <Square className="h-3 w-3" />
         </button>
         <button
           onClick={() => appWindow.close()}
           className="flex h-full w-11 items-center justify-center text-titlebar-foreground hover:bg-destructive hover:text-white transition-colors"
-          aria-label="Close"
+          aria-label={t("window.close")}
         >
           <X className="h-3.5 w-3.5" />
         </button>

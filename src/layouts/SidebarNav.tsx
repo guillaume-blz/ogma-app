@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { ParseKeys } from "i18next";
 import {
   Home,
   Database,
@@ -20,62 +22,63 @@ import { WorkspaceSwitcher } from "@/components/WorkspaceSwitcher";
 interface NavItem {
   id: string;
   icon: LucideIcon;
-  label: string;
+  labelKey: ParseKeys;
 }
 
 interface NavSection {
-  title?: string;
+  titleKey?: ParseKeys;
   items: NavItem[];
 }
 
 const navigation: NavSection[] = [
   {
-    items: [{ id: "home", icon: Home, label: "Home" }],
+    items: [{ id: "home", icon: Home, labelKey: "nav.home" }],
   },
   {
-    title: "Data",
+    titleKey: "section.data",
     items: [
-      { id: "sources", icon: Database, label: "Sources" },
-      { id: "pipelines", icon: Workflow, label: "Pipelines" },
-      { id: "data-models", icon: Layers, label: "Data Models" },
-      { id: "visualizations", icon: BarChart3, label: "Visualizations" },
-      { id: "dashboards", icon: LayoutDashboard, label: "Dashboards" },
+      { id: "sources", icon: Database, labelKey: "nav.sources" },
+      { id: "pipelines", icon: Workflow, labelKey: "nav.pipelines" },
+      { id: "data-models", icon: Layers, labelKey: "nav.dataModels" },
+      { id: "visualizations", icon: BarChart3, labelKey: "nav.visualizations" },
+      { id: "dashboards", icon: LayoutDashboard, labelKey: "nav.dashboards" },
     ],
   },
   {
-    title: "Automation",
+    titleKey: "section.automation",
     items: [
-      { id: "schedules", icon: CalendarClock, label: "Schedules" },
-      { id: "jobs", icon: Cpu, label: "Jobs" },
+      { id: "schedules", icon: CalendarClock, labelKey: "nav.schedules" },
+      { id: "jobs", icon: Cpu, labelKey: "nav.jobs" },
     ],
   },
   {
-    title: "Library",
+    titleKey: "section.library",
     items: [
-      { id: "exports", icon: Download, label: "Exports" },
-      { id: "shared", icon: Users, label: "Shared with me" },
+      { id: "exports", icon: Download, labelKey: "nav.exports" },
+      { id: "shared", icon: Users, labelKey: "nav.sharedWithMe" },
     ],
   },
   {
-    title: "Settings",
-    items: [{ id: "settings", icon: Settings, label: "Settings" }],
+    titleKey: "section.settings",
+    items: [{ id: "settings", icon: Settings, labelKey: "nav.settings" }],
   },
 ];
 
 export function SidebarNav() {
   const [activeId, setActiveId] = useState("home");
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col h-full">
       <nav className="flex flex-col gap-0.5 p-2 overflow-y-auto flex-1">
         {navigation.map((section, i) => (
           <div key={i}>
-            {section.title && <MenuTitle label={section.title} />}
+            {section.titleKey && <MenuTitle label={t(section.titleKey)} />}
             {section.items.map((item) => (
               <MenuItem
                 key={item.id}
                 icon={item.icon}
-                label={item.label}
+                label={t(item.labelKey)}
                 active={activeId === item.id}
                 onClick={() => setActiveId(item.id)}
               />
