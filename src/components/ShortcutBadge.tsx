@@ -1,6 +1,7 @@
 import { cn } from "@/lib/utils";
 import { getKeys, formatDisplay } from "@/shortcuts";
 import type { ShortcutId } from "@/shortcuts";
+import { Kbd } from "@/components/ui/kbd";
 
 interface ShortcutBadgeProps {
   id: ShortcutId;
@@ -12,13 +13,8 @@ export function ShortcutBadge({ id, className }: ShortcutBadgeProps) {
   if (!keys) return null;
 
   return (
-    <kbd
-      className={cn(
-        "inline-flex items-center rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground",
-        className
-      )}
-    >
+    <Kbd className={cn("px-1.5 py-0.5 text-xs", className)}>
       {formatDisplay(keys)}
-    </kbd>
+    </Kbd>
   );
 }
