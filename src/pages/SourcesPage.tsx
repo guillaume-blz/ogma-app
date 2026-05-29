@@ -24,8 +24,8 @@ export function SourcesPage() {
   };
 
   const handleEdit = (source: Source) => {
-    setEditSource(source);
-    setDrawerOpen(true);
+    addTab({ id: `source-${source.id}`, path: `/sources/${source.id}`, label: source.name });
+    navigate(`/sources/${source.id}?tab=settings`);
   };
 
   const handleNew = () => {

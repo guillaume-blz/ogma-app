@@ -5,6 +5,7 @@ import { MenuTitle } from "@/components/MenuTitle";
 import { WorkspaceSwitcher } from "@/components/WorkspaceSwitcher";
 import { useTabStore } from "@/stores/tabStore";
 import { navigation } from "@/app/navigation";
+import { SidebarSourcesSection } from "@/layouts/SidebarSourcesSection";
 
 export function SidebarNav() {
   const navigate = useNavigate();
@@ -23,15 +24,19 @@ export function SidebarNav() {
         {navigation.map((section, i) => (
           <div key={i}>
             {section.titleKey && <MenuTitle label={t(section.titleKey)} />}
-            {section.items.map((item) => (
-              <MenuItem
-                key={item.id}
-                icon={item.icon}
-                label={t(item.labelKey)}
-                active={location.pathname === item.path}
-                onClick={() => handleNavClick(item.id, item.path)}
-              />
-            ))}
+            {section.items.map((item) =>
+              item.id === "sources" ? (
+                <SidebarSourcesSection key={item.id} label={t(item.labelKey)} />
+              ) : (
+                <MenuItem
+                  key={item.id}
+                  icon={item.icon}
+                  label={t(item.labelKey)}
+                  active={location.pathname === item.path}
+                  onClick={() => handleNavClick(item.id, item.path)}
+                />
+              )
+            )}
           </div>
         ))}
       </nav>
