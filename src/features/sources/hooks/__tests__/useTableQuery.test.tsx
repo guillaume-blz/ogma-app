@@ -14,7 +14,7 @@ function wrapper() {
   );
 }
 
-const result: QueryResult = { columns: ["id", "name"], rows: [[1, "Alice"]], total: 1 };
+const mockResult: QueryResult = { columns: ["id", "name"], rows: [[1, "Alice"]], total: 200 };
 
 beforeEach(() => { mockInvoke.mockReset(); });
 
@@ -25,13 +25,13 @@ describe("useTableQuery", () => {
   });
 
   it("fetches data when table is set", async () => {
-    mockInvoke.mockResolvedValue(result);
+    mockInvoke.mockResolvedValue(mockResult);
     const { result: hook } = renderHook(
       () => useTableQuery({ sourceId: "s1", table: "users" }),
       { wrapper: wrapper() },
     );
 
-    await waitFor(() => expect(hook.current.result).toEqual(result));
+    await waitFor(() => expect(hook.current.rowCount).toBe(200));
     expect(mockInvoke).toHaveBeenCalledWith("source_query", {
       id: "s1",
       query: { table: "users", limit: 50, offset: 0, order_by: undefined },
@@ -39,34 +39,36 @@ describe("useTableQuery", () => {
   });
 
   it("resets to page 1 when table changes", async () => {
-    mockInvoke.mockResolvedValue(result);
+    mockInvoke.mockResolvedValue(mockResult);
     const { result: hook, rerender } = renderHook(
       ({ table }: { table: string }) => useTableQuery({ sourceId: "s1", table }),
       { wrapper: wrapper(), initialProps: { table: "users" } },
     );
 
-    await waitFor(() => expect(hook.current.result).toBeTruthy());
-    act(() => { hook.current.setPage(3); });
-    expect(hook.current.page).toBe(3);
+    await waitFor(() => expect(hook.current.rowCount).toBeTruthy());
+    act(() => { hook.current.table.setPageIndex(2); });
+    await waitFor(() => expect(hook.current.table.getState().pagination.pageIndex).toBe(2));
 
     rerender({ table: "orders" });
-    await waitFor(() => expect(hook.current.page).toBe(1));
+    await waitFor(() => expect(hook.current.table.getState().pagination.pageIndex).toBe(0));
   });
 
-  it("toggleOrder cycles asc → desc → null", () => {
-    mockInvoke.mockResolvedValue(result);
+  it("sorting: set asc, set desc, then clear", async () => {
+    mockInvoke.mockResolvedValue(mockResult);
     const { result: hook } = renderHook(
       () => useTableQuery({ sourceId: "s1", table: "users" }),
       { wrapper: wrapper() },
     );
 
-    act(() => { hook.current.toggleOrder("name"); });
-    expect(hook.current.orderBy).toEqual({ column: "name", direction: "asc" });
+    await waitFor(() => expect(hook.current.rowCount).toBeTruthy());
 
-    act(() => { hook.current.toggleOrder("name"); });
-    expect(hook.current.orderBy).toEqual({ column: "name", direction: "desc" });
+    act(() => { hook.current.table.setSorting([{ id: "name", desc: false }]); });
+    await waitFor(() => expect(hook.current.table.getState().sorting).toEqual([{ id: "name", desc: false }]));
 
-    act(() => { hook.current.toggleOrder("name"); });
-    expect(hook.current.orderBy).toBeNull();
+    act(() => { hook.current.table.setSorting([{ id: "name", desc: true }]); });
+    await waitFor(() => expect(hook.current.table.getState().sorting).toEqual([{ id: "name", desc: true }]));
+
+    act(() => { hook.current.table.setSorting([]); });
+    await waitFor(() => expect(hook.current.table.getState().sorting).toEqual([]));
   });
 });

@@ -1,8 +1,16 @@
-import { useEffect, useState, useCallback } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState, useMemo } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { invoke } from "@tauri-apps/api/core";
+import {
+  useReactTable,
+  getCoreRowModel,
+  type ColumnDef,
+  type PaginationState,
+  type SortingState,
+  type Table,
+} from "@tanstack/react-table";
 import { sourceKeys } from "../query-keys";
-import type { QueryResult, OrderBy } from "../types";
+import type { QueryResult } from "../types";
 
 export const PAGE_SIZES = [25, 50, 100] as const;
 export type PageSize = (typeof PAGE_SIZES)[number];
@@ -12,61 +20,85 @@ interface UseTableQueryOptions {
   table: string | null;
 }
 
-export function useTableQuery({ sourceId, table }: UseTableQueryOptions) {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState<PageSize>(50);
-  const [orderBy, setOrderBy] = useState<OrderBy | null>(null);
+interface UseTableQueryResult {
+  table: Table<unknown[]>;
+  loading: boolean;
+  error: string | null;
+  rowCount: number | undefined;
+  refresh: () => void;
+}
+
+export function useTableQuery({ sourceId, table }: UseTableQueryOptions): UseTableQueryResult {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 50,
+  });
+  const [sorting, setSorting] = useState<SortingState>([]);
 
   useEffect(() => {
-    setPage(1);
-    setOrderBy(null);
+    setPagination((p) => ({ ...p, pageIndex: 0 }));
+    setSorting([]);
   }, [table]);
 
+  const orderBy = sorting[0]
+    ? { column: sorting[0].id, direction: sorting[0].desc ? ("desc" as const) : ("asc" as const) }
+    : undefined;
+
   const query = useQuery({
-    queryKey: sourceKeys.tableData(sourceId, table ?? "", page, pageSize, orderBy),
+    queryKey: sourceKeys.tableData(
+      sourceId,
+      table ?? "",
+      pagination.pageIndex + 1,
+      pagination.pageSize,
+      orderBy ?? null
+    ),
     queryFn: () =>
       invoke<QueryResult>("source_query", {
         id: sourceId,
         query: {
           table: table!,
-          limit: pageSize,
-          offset: (page - 1) * pageSize,
+          limit: pagination.pageSize,
+          offset: pagination.pageIndex * pagination.pageSize,
           order_by: orderBy ? [orderBy] : undefined,
         },
       }),
     enabled: !!table,
+    placeholderData: keepPreviousData,
   });
 
-  const toggleOrder = useCallback((column: string) => {
-    setOrderBy((prev) => {
-      if (!prev || prev.column !== column) return { column, direction: "asc" };
-      if (prev.direction === "asc") return { column, direction: "desc" };
-      return null;
-    });
-    setPage(1);
-  }, []);
+  const result = query.data;
 
-  const setPageSizeSafe = useCallback((size: PageSize) => {
-    setPageSize(size);
-    setPage(1);
-  }, []);
+  const columns = useMemo<ColumnDef<unknown[]>[]>(() => {
+    if (!result?.columns.length) return [];
+    return result.columns.map((col, idx) => ({
+      id: col,
+      header: col,
+      accessorFn: (row: unknown[]) => row[idx],
+    }));
+  }, [result?.columns]);
 
-  const totalPages =
-    query.data?.total != null
-      ? Math.max(1, Math.ceil(query.data.total / pageSize))
-      : null;
+  const data = result?.rows ?? [];
+  const rowCount = result?.total;
+  const pageCount =
+    rowCount != null ? Math.max(1, Math.ceil(rowCount / pagination.pageSize)) : -1;
+
+  const tanTable = useReactTable<unknown[]>({
+    data,
+    columns,
+    state: { pagination, sorting },
+    pageCount,
+    manualPagination: true,
+    manualSorting: true,
+    onPaginationChange: setPagination,
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+  });
 
   return {
+    table: tanTable,
     loading: query.isFetching,
     error: query.error ? String(query.error) : null,
-    result: query.data ?? null,
-    page,
-    pageSize,
-    orderBy,
-    totalPages,
-    setPage,
-    setPageSize: setPageSizeSafe,
-    toggleOrder,
+    rowCount,
     refresh: query.refetch,
   };
 }

@@ -1,28 +1,19 @@
 import { useSearchParams } from "react-router-dom";
 import { TableProperties } from "lucide-react";
-import { useTableQuery } from "../../hooks/useTableQuery";
+import { useTableQuery, type PageSize } from "../../hooks/useTableQuery";
 import { DataGrid } from "./DataGrid";
 import { QueryToolbar } from "./QueryToolbar";
 
 export function DataTab({ sourceId }: { sourceId: string }) {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const table = searchParams.get("table");
+  const [searchParams] = useSearchParams();
+  const dbTable = searchParams.get("table");
 
-  const {
-    loading,
-    error,
-    result,
-    page,
-    pageSize,
-    orderBy,
-    totalPages,
-    setPage,
-    setPageSize,
-    toggleOrder,
-    refresh,
-  } = useTableQuery({ sourceId, table });
+  const { table, loading, error, rowCount, refresh } = useTableQuery({
+    sourceId,
+    table: dbTable,
+  });
 
-  if (!table) {
+  if (!dbTable) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
         <TableProperties className="size-8 opacity-30" />
@@ -31,26 +22,20 @@ export function DataTab({ sourceId }: { sourceId: string }) {
     );
   }
 
-  const handlePageChange = (p: number) => {
-    setPage(p);
-    setSearchParams((prev) => {
-      prev.set("tab", "data");
-      if (table) prev.set("table", table);
-      return prev;
-    });
-  };
+  const { pageIndex, pageSize } = table.getState().pagination;
+  const pageCount = table.getPageCount();
 
   return (
     <div className="flex flex-col gap-3">
       <QueryToolbar
-        table={table}
-        total={result?.total}
-        page={page}
-        pageSize={pageSize}
-        totalPages={totalPages}
+        table={dbTable}
+        total={rowCount}
+        page={pageIndex + 1}
+        pageSize={pageSize as PageSize}
+        totalPages={pageCount === -1 ? null : pageCount}
         loading={loading}
-        onPageChange={handlePageChange}
-        onPageSizeChange={setPageSize}
+        onPageChange={(p) => table.setPageIndex(p - 1)}
+        onPageSizeChange={(size) => table.setPageSize(size)}
         onRefresh={refresh}
       />
 
@@ -60,7 +45,7 @@ export function DataTab({ sourceId }: { sourceId: string }) {
         </div>
       )}
 
-      {!error && loading && !result && (
+      {!error && loading && table.getRowModel().rows.length === 0 && (
         <div className="space-y-1.5">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="h-8 rounded bg-muted/40 animate-pulse" />
@@ -68,8 +53,8 @@ export function DataTab({ sourceId }: { sourceId: string }) {
         </div>
       )}
 
-      {!error && result && (
-        <DataGrid result={result} orderBy={orderBy} onToggleOrder={toggleOrder} />
+      {!error && table.getRowModel().rows.length > 0 && (
+        <DataGrid table={table} />
       )}
     </div>
   );
