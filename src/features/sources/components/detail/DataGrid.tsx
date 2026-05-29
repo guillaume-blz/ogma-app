@@ -23,31 +23,41 @@ export function DataGrid({ table }: DataGridProps) {
         <thead className="sticky top-0 z-10 bg-muted/90 backdrop-blur-sm">
           {table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
-              <th className="w-10 border-b border-r border-border px-2 py-2 text-center font-mono text-muted-foreground/40 select-none">
-                #
-              </th>
               {headerGroup.headers.map((header) => {
+                const pinned = header.column.getIsPinned();
+                const isRowNumber = header.column.id === "rowNumber";
                 const sorted = header.column.getIsSorted();
                 return (
                   <th
                     key={header.id}
-                    onClick={header.column.getToggleSortingHandler()}
-                    className="group cursor-pointer select-none border-b border-r border-border px-3 py-2 text-left font-medium text-muted-foreground hover:bg-accent/40 hover:text-foreground whitespace-nowrap last:border-r-0"
+                    style={pinned === "left" ? { left: header.column.getStart("left") } : undefined}
+                    onClick={isRowNumber ? undefined : header.column.getToggleSortingHandler()}
+                    className={cn(
+                      "border-b border-r border-border",
+                      pinned === "left" && "sticky z-20 bg-muted/90",
+                      isRowNumber
+                        ? "px-2 py-2 text-center font-mono text-muted-foreground/40 select-none"
+                        : "group cursor-pointer select-none px-3 py-2 text-left font-medium text-muted-foreground hover:bg-accent/40 hover:text-foreground whitespace-nowrap last:border-r-0"
+                    )}
                   >
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                      </span>
-                      <span className="shrink-0">
-                        {sorted === "asc" ? (
-                          <ChevronUp className="size-3 text-primary" />
-                        ) : sorted === "desc" ? (
-                          <ChevronDown className="size-3 text-primary" />
-                        ) : (
-                          <ChevronsUpDown className="size-3 opacity-0 group-hover:opacity-40 transition-opacity" />
-                        )}
-                      </span>
-                    </div>
+                    {isRowNumber ? (
+                      flexRender(header.column.columnDef.header, header.getContext())
+                    ) : (
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono">
+                          {flexRender(header.column.columnDef.header, header.getContext())}
+                        </span>
+                        <span className="shrink-0">
+                          {sorted === "asc" ? (
+                            <ChevronUp className="size-3 text-primary" />
+                          ) : sorted === "desc" ? (
+                            <ChevronDown className="size-3 text-primary" />
+                          ) : (
+                            <ChevronsUpDown className="size-3 opacity-0 group-hover:opacity-40 transition-opacity" />
+                          )}
+                        </span>
+                      </div>
+                    )}
                   </th>
                 );
               })}
@@ -63,17 +73,28 @@ export function DataGrid({ table }: DataGridProps) {
                 i % 2 === 0 ? "bg-background" : "bg-muted/10"
               )}
             >
-              <td className="border-r border-border/40 px-2 py-1.5 text-center font-mono text-muted-foreground/30 select-none">
-                {i + 1}
-              </td>
-              {row.getVisibleCells().map((cell) => (
-                <td
-                  key={cell.id}
-                  className="border-r border-border/30 px-3 py-1.5 last:border-r-0"
-                >
-                  <CellValue value={cell.getValue()} />
-                </td>
-              ))}
+              {row.getVisibleCells().map((cell) => {
+                const pinned = cell.column.getIsPinned();
+                const isRowNumber = cell.column.id === "rowNumber";
+                return (
+                  <td
+                    key={cell.id}
+                    style={pinned === "left" ? { left: cell.column.getStart("left") } : undefined}
+                    className={cn(
+                      "border-r py-1.5",
+                      pinned === "left" && "sticky z-10",
+                      pinned === "left" && (i % 2 === 0 ? "bg-background" : "bg-muted/10"),
+                      isRowNumber
+                        ? "border-border/40 px-2 text-center font-mono text-muted-foreground/30 select-none"
+                        : "border-border/30 px-3 last:border-r-0"
+                    )}
+                  >
+                    {isRowNumber
+                      ? flexRender(cell.column.columnDef.cell, cell.getContext())
+                      : <CellValue value={cell.getValue()} />}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>

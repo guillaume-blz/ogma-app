@@ -69,12 +69,22 @@ export function useTableQuery({ sourceId, table }: UseTableQueryOptions): UseTab
   const result = query.data;
 
   const columns = useMemo<ColumnDef<unknown[]>[]>(() => {
-    if (!result?.columns.length) return [];
-    return result.columns.map((col, idx) => ({
-      id: col,
-      header: col,
-      accessorFn: (row: unknown[]) => row[idx],
-    }));
+    const rowNumberCol: ColumnDef<unknown[]> = {
+      id: "rowNumber",
+      header: "#",
+      size: 40,
+      enableSorting: false,
+      cell: ({ row }) => row.index + 1,
+    };
+    if (!result?.columns.length) return [rowNumberCol];
+    return [
+      rowNumberCol,
+      ...result.columns.map((col, idx) => ({
+        id: col,
+        header: col,
+        accessorFn: (row: unknown[]) => row[idx],
+      })),
+    ];
   }, [result?.columns]);
 
   const data = result?.rows ?? [];
@@ -86,6 +96,7 @@ export function useTableQuery({ sourceId, table }: UseTableQueryOptions): UseTab
     data,
     columns,
     state: { pagination, sorting },
+    initialState: { columnPinning: { left: ["rowNumber"] } },
     pageCount,
     manualPagination: true,
     manualSorting: true,

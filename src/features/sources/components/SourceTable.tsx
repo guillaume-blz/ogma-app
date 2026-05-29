@@ -1,5 +1,18 @@
-import { useState } from "react";
-import { Edit2, Trash2, Plug, Loader2, CheckCircle2, XCircle, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import { useState, useMemo } from "react";
+import {
+  Edit2, Trash2, Plug, Loader2, CheckCircle2, XCircle,
+  ChevronLeft, ChevronRight, ExternalLink, ArrowUpDown, ArrowUp, ArrowDown,
+} from "lucide-react";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  flexRender,
+  type ColumnDef,
+  type SortingState,
+  type PaginationState,
+} from "@tanstack/react-table";
 import { cn } from "@/lib/utils";
 import { SourceTypeIcon } from "./SourceTypeIcon";
 import type { DatabaseConfig, Source } from "../types";
@@ -34,11 +47,9 @@ interface SourceTableProps {
 }
 
 export function SourceTable({ sources, onOpen, onEdit, onDelete, onTest }: SourceTableProps) {
-  const [page, setPage] = useState(1);
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [pagination, setPagination] = useState<PaginationState>({ pageIndex: 0, pageSize: PAGE_SIZE });
   const [statuses, setStatuses] = useState<Record<string, TestStatus>>({});
-
-  const totalPages = Math.max(1, Math.ceil(sources.length / PAGE_SIZE));
-  const slice = sources.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleTest = async (id: string) => {
     setStatuses((s) => ({ ...s, [id]: "testing" }));
@@ -50,25 +61,96 @@ export function SourceTable({ sources, onOpen, onEdit, onDelete, onTest }: Sourc
     }
   };
 
+  const columns = useMemo<ColumnDef<Source>[]>(
+    () => [
+      {
+        id: "name",
+        accessorKey: "name",
+        header: "Source Name",
+      },
+      {
+        id: "source_type",
+        accessorKey: "source_type",
+        header: "Type",
+        sortingFn: (a, b) => {
+          const la = TYPE_LABELS[a.original.source_type] ?? a.original.source_type;
+          const lb = TYPE_LABELS[b.original.source_type] ?? b.original.source_type;
+          return la.localeCompare(lb);
+        },
+      },
+      {
+        id: "connection",
+        header: "Connection",
+        enableSorting: false,
+      },
+      {
+        id: "status",
+        header: "Status",
+        enableSorting: false,
+      },
+      {
+        id: "actions",
+        header: "Actions",
+        enableSorting: false,
+      },
+    ],
+    []
+  );
+
+  const table = useReactTable({
+    data: sources,
+    columns,
+    state: { sorting, pagination },
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  const rows = table.getRowModel().rows;
+  const pageCount = table.getPageCount();
+  const pageIndex = table.getState().pagination.pageIndex;
+
   return (
     <div className="flex flex-col">
       <div className="overflow-hidden rounded-lg border border-border">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border bg-muted/40">
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Source Name</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Type</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Connection</th>
-              <th className="px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">Status</th>
-              <th className="px-4 py-2.5 text-right text-xs font-medium text-muted-foreground">Actions</th>
+              {table.getHeaderGroups()[0].headers.map((header) => (
+                <th
+                  key={header.id}
+                  onClick={header.column.getToggleSortingHandler()}
+                  className={cn(
+                    "px-4 py-2.5 text-xs font-medium text-muted-foreground",
+                    header.id === "actions" ? "text-right" : "text-left",
+                    header.column.getCanSort() && "cursor-pointer select-none hover:text-foreground"
+                  )}
+                >
+                  <div className={cn("flex items-center gap-1", header.id === "actions" && "justify-end")}>
+                    {flexRender(header.column.columnDef.header, header.getContext())}
+                    {header.column.getCanSort() && (
+                      header.column.getIsSorted() === "asc" ? (
+                        <ArrowUp className="size-3" />
+                      ) : header.column.getIsSorted() === "desc" ? (
+                        <ArrowDown className="size-3" />
+                      ) : (
+                        <ArrowUpDown className="size-3 opacity-40" />
+                      )
+                    )}
+                  </div>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {slice.map((source, i) => {
+            {rows.map((row, i) => {
+              const source = row.original;
               const status = statuses[source.id] ?? "idle";
               return (
                 <tr
-                  key={source.id}
+                  key={row.id}
                   className={cn(
                     "border-b border-border last:border-0 transition-colors hover:bg-muted/30",
                     i % 2 === 0 ? "bg-background" : "bg-muted/10"
@@ -104,22 +186,7 @@ export function SourceTable({ sources, onOpen, onEdit, onDelete, onTest }: Sourc
                   </td>
 
                   <td className="px-4 py-3">
-                    {status === "idle" && <span className="text-xs text-muted-foreground">—</span>}
-                    {status === "testing" && (
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Loader2 className="size-3 animate-spin" />Testing…
-                      </span>
-                    )}
-                    {status === "ok" && (
-                      <span className="flex items-center gap-1 text-xs text-green-500">
-                        <CheckCircle2 className="size-3" />Connected
-                      </span>
-                    )}
-                    {status === "error" && (
-                      <span className="flex items-center gap-1 text-xs text-destructive">
-                        <XCircle className="size-3" />Failed
-                      </span>
-                    )}
+                    <TestStatusCell status={status} />
                   </td>
 
                   <td className="px-4 py-3">
@@ -158,13 +225,13 @@ export function SourceTable({ sources, onOpen, onEdit, onDelete, onTest }: Sourc
       <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
         <span>{sources.length} source{sources.length !== 1 ? "s" : ""}</span>
 
-        {totalPages > 1 && (
+        {pageCount > 1 && (
           <div className="flex items-center gap-1">
-            <PaginationBtn onClick={() => setPage((p) => p - 1)} disabled={page === 1}>
+            <PaginationBtn onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
               <ChevronLeft className="size-3.5" />
             </PaginationBtn>
-            <span className="px-2">{page} / {totalPages}</span>
-            <PaginationBtn onClick={() => setPage((p) => p + 1)} disabled={page === totalPages}>
+            <span className="px-2">{pageIndex + 1} / {pageCount}</span>
+            <PaginationBtn onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
               <ChevronRight className="size-3.5" />
             </PaginationBtn>
           </div>
@@ -172,6 +239,28 @@ export function SourceTable({ sources, onOpen, onEdit, onDelete, onTest }: Sourc
       </div>
     </div>
   );
+}
+
+function TestStatusCell({ status }: { status: TestStatus }) {
+  if (status === "testing")
+    return (
+      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+        <Loader2 className="size-3 animate-spin" />Testing…
+      </span>
+    );
+  if (status === "ok")
+    return (
+      <span className="flex items-center gap-1 text-xs text-green-500">
+        <CheckCircle2 className="size-3" />Connected
+      </span>
+    );
+  if (status === "error")
+    return (
+      <span className="flex items-center gap-1 text-xs text-destructive">
+        <XCircle className="size-3" />Failed
+      </span>
+    );
+  return <span className="text-xs text-muted-foreground">—</span>;
 }
 
 function ActionBtn({ children, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {

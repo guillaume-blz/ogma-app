@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ChevronRight, Database, FileText, Globe, Cloud, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSourceStore } from "@/features/sources/store";
+import { useSourcesQuery } from "@/features/sources/hooks/useSourcesQuery";
 import { useTabStore } from "@/stores/tabStore";
 import type { SourceType } from "@/features/sources/types";
 
@@ -15,25 +15,18 @@ const SOURCE_ICON: Record<SourceType, React.ElementType> = {
 
 export function SidebarSourcesSection({ label }: { label: string }) {
   const [expanded, setExpanded] = useState(false);
-  const [fetched, setFetched] = useState(false);
 
   const navigate = useNavigate();
   const location = useLocation();
   const addTab = useTabStore((s) => s.addTab);
 
-  const sources = useSourceStore((s) => s.sources);
-  const loading = useSourceStore((s) => s.loading);
-  const fetchSources = useSourceStore((s) => s.fetchSources);
+  const { data: sources = [], isFetching: loading } = useSourcesQuery();
 
   const isParentActive =
     location.pathname === "/sources" || location.pathname.startsWith("/sources/");
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (!expanded && !fetched) {
-      fetchSources();
-      setFetched(true);
-    }
     setExpanded((v) => !v);
   };
 
