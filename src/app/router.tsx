@@ -11,6 +11,7 @@ import { JobsPage } from "@/pages/JobsPage";
 import { ExportsPage } from "@/pages/ExportsPage";
 import { SharedPage } from "@/pages/SharedPage";
 import { SettingsPage } from "@/pages/SettingsPage";
+import { SourceDetailPage } from "@/pages/SourceDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -18,6 +19,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true,              element: <HomePage />         },
       { path: "sources",          element: <SourcesPage />      },
+      { path: "sources/:id",      element: <SourceDetailPage /> },
       { path: "pipelines",        element: <PipelinesPage />    },
       { path: "data-models",      element: <DataModelsPage />   },
       { path: "visualizations",   element: <VisualizationsPage /> },

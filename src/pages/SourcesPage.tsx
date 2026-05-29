@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { SourceCard } from "@/features/sources/components/SourceCard";
+import { useNavigate } from "react-router-dom";
+import { SourceTable } from "@/features/sources/components/SourceTable";
 import { SourceDrawer } from "@/features/sources/components/SourceDrawer";
 import { useSourceStore } from "@/features/sources/store";
+import { useTabStore } from "@/stores/tabStore";
 import type { Source } from "@/features/sources/types";
 
 export function SourcesPage() {
@@ -11,8 +13,15 @@ export function SourcesPage() {
   const { sources, loading, fetchSources, deleteSource, testSource } = useSourceStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editSource, setEditSource] = useState<Source | undefined>();
+  const navigate = useNavigate();
+  const addTab = useTabStore((s) => s.addTab);
 
   useEffect(() => { fetchSources(); }, [fetchSources]);
+
+  const handleOpen = (source: Source) => {
+    addTab({ id: `source-${source.id}`, path: `/sources/${source.id}`, label: source.name });
+    navigate(`/sources/${source.id}`);
+  };
 
   const handleEdit = (source: Source) => {
     setEditSource(source);
@@ -30,8 +39,8 @@ export function SourcesPage() {
   };
 
   return (
-    <div className="max-w-3xl">
-      <div className="mb-6 flex items-start justify-between border-b border-border pb-6">
+    <div className="flex flex-col gap-6">
+      <div className="flex items-start justify-between border-b border-border pb-6">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             {t("nav.sources")}
@@ -59,17 +68,15 @@ export function SourcesPage() {
         </div>
       )}
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {sources.map((source) => (
-          <SourceCard
-            key={source.id}
-            source={source}
-            onEdit={handleEdit}
-            onDelete={deleteSource}
-            onTest={testSource}
-          />
-        ))}
-      </div>
+      {!loading && sources.length > 0 && (
+        <SourceTable
+          sources={sources}
+          onOpen={handleOpen}
+          onEdit={handleEdit}
+          onDelete={deleteSource}
+          onTest={testSource}
+        />
+      )}
 
       <SourceDrawer
         open={drawerOpen}

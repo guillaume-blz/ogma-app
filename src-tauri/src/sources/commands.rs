@@ -1,6 +1,6 @@
 use tauri::State;
 use crate::state::AppState;
-use crate::sources::{models::SourceType, query::AbstractQuery, store, connectors::make_connector};
+use crate::sources::{models::{SourceType, SshTunnelConfig}, query::AbstractQuery, store, connectors::make_connector};
 
 #[tauri::command]
 pub async fn source_list(state: State<'_, AppState>) -> Result<Vec<serde_json::Value>, String> {
@@ -67,4 +67,9 @@ pub async fn source_query(
     let connector = make_connector(&source).map_err(|e| e.to_string())?;
     let result = connector.execute_query(query).await.map_err(|e| e.to_string())?;
     serde_json::to_value(&result).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn source_test_ssh(config: SshTunnelConfig) -> Result<String, String> {
+    crate::ssh::test_ssh_tunnel(&config).await
 }

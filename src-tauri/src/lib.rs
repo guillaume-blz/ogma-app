@@ -1,4 +1,5 @@
 mod db;
+mod ssh;
 mod state;
 mod sources;
 
@@ -15,6 +16,7 @@ fn greet(name: &str) -> String {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_global_shortcut::Builder::new().build())
         .setup(|app| {
             let db = tauri::async_runtime::block_on(db::init(app.handle()))
@@ -31,6 +33,7 @@ pub fn run() {
             source_test,
             source_schema,
             source_query,
+            source_test_ssh,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -1,10 +1,17 @@
-import { X, ArrowLeftToLine, ArrowRightToLine } from "lucide-react";
+import { X, ArrowLeftToLine, ArrowRightToLine, Database } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useTabStore, type Tab } from "@/stores/tabStore";
 import { findNavItem } from "@/app/navigation";
 import { PopupMenu, type PopupMenuItemConfig } from "@/components/PopupMenu";
 import { cn } from "@/lib/utils";
+
+function resolveTab(tab: Tab, t: ReturnType<typeof import("react-i18next").useTranslation>["t"]) {
+  const item = findNavItem(tab.id);
+  if (item) return { Icon: item.icon, label: t(item.labelKey) };
+  if (tab.path.startsWith("/sources/")) return { Icon: Database, label: tab.label ?? tab.id };
+  return null;
+}
 
 export function TabBar() {
   const { openTabs, closeTab, closeTabsWhere } = useTabStore();
@@ -64,9 +71,9 @@ export function TabBar() {
   return (
     <div className="flex items-end h-9 border-b border-border bg-background shrink-0 overflow-x-auto scrollbar-none">
       {openTabs.map((tab) => {
-        const item = findNavItem(tab.id);
-        if (!item) return null;
-        const Icon = item.icon;
+        const resolved = resolveTab(tab, t);
+        if (!resolved) return null;
+        const { Icon, label: tabLabel } = resolved;
         const isActive = location.pathname === tab.path;
 
         return (
@@ -82,7 +89,7 @@ export function TabBar() {
               )}
             >
               <Icon className="h-3.5 w-3.5 shrink-0" />
-              <span className="truncate flex-1 text-left">{t(item.labelKey)}</span>
+              <span className="truncate flex-1 text-left">{tabLabel}</span>
               <span
                 role="button"
                 aria-label={t("tabs.close")}

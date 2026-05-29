@@ -4,6 +4,7 @@ import { persist } from "zustand/middleware";
 export interface Tab {
   id: string;
   path: string;
+  label?: string;
 }
 
 interface TabStore {

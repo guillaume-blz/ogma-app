@@ -5,6 +5,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import type { DatabaseConfig, DatabaseDriver } from "../../types";
+import { SshTunnelForm } from "./SshTunnelForm";
 
 const DEFAULT_PORTS: Record<DatabaseDriver, number> = {
   postgres: 5432,
@@ -142,6 +143,11 @@ export function DatabaseConfigForm({ value, onChange, onTest }: DatabaseConfigFo
           )}
         </div>
       )}
+
+      <SshTunnelForm
+        value={value.ssh_tunnel}
+        onChange={(ssh) => set({ ssh_tunnel: ssh })}
+      />
     </div>
   );
 }

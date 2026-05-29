@@ -55,6 +55,25 @@ pub enum DatabaseDriver {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum SshAuthType {
+    Password,
+    Key,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SshTunnelConfig {
+    pub host: String,
+    pub port: u16,
+    pub username: String,
+    pub auth_type: SshAuthType,
+    pub password: Option<String>,
+    pub key_path: Option<String>,
+    pub passphrase: Option<String>,
+    pub known_host_key: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DatabaseConfig {
     pub driver: DatabaseDriver,
     pub host: String,
@@ -62,18 +81,24 @@ pub struct DatabaseConfig {
     pub database: String,
     pub username: String,
     pub password: String, // TODO: move to OS keychain
+    #[serde(default)]
+    pub ssh_tunnel: Option<SshTunnelConfig>,
 }
 
 impl DatabaseConfig {
     pub fn connection_url(&self) -> String {
+        self.connection_url_for(&self.host, self.port)
+    }
+
+    pub fn connection_url_for(&self, host: &str, port: u16) -> String {
         match self.driver {
             DatabaseDriver::Postgres => format!(
                 "postgresql://{}:{}@{}:{}/{}",
-                self.username, self.password, self.host, self.port, self.database
+                self.username, self.password, host, port, self.database
             ),
             DatabaseDriver::Mysql => format!(
                 "mysql://{}:{}@{}:{}/{}",
-                self.username, self.password, self.host, self.port, self.database
+                self.username, self.password, host, port, self.database
             ),
             DatabaseDriver::Sqlite => format!("sqlite://{}", self.host),
         }

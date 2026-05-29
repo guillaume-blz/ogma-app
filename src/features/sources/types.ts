@@ -2,6 +2,19 @@ export type SourceType = "database" | "files" | "api" | "saas";
 
 export type DatabaseDriver = "postgres" | "mysql" | "sqlite";
 
+export type SshAuthType = "password" | "key";
+
+export interface SshTunnelConfig {
+  host: string;
+  port: number;
+  username: string;
+  auth_type: SshAuthType;
+  password?: string;
+  key_path?: string;
+  passphrase?: string;
+  known_host_key?: string;
+}
+
 export interface DatabaseConfig {
   driver: DatabaseDriver;
   host: string;
@@ -9,6 +22,7 @@ export interface DatabaseConfig {
   database: string;
   username: string;
   password: string;
+  ssh_tunnel?: SshTunnelConfig;
 }
 
 export type SourceConfig = DatabaseConfig; // extend with | FilesConfig | ApiConfig as needed
