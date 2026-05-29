@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { SourceTable } from "@/features/sources/components/SourceTable";
 import { SourceDrawer } from "@/features/sources/components/SourceDrawer";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { useSourceStore } from "@/features/sources/store";
 import { useTabStore } from "@/stores/tabStore";
 import type { Source } from "@/features/sources/types";
@@ -13,6 +14,7 @@ export function SourcesPage() {
   const { sources, loading, fetchSources, deleteSource, testSource } = useSourceStore();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editSource, setEditSource] = useState<Source | undefined>();
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const navigate = useNavigate();
   const addTab = useTabStore((s) => s.addTab);
 
@@ -36,6 +38,12 @@ export function SourcesPage() {
   const handleClose = () => {
     setDrawerOpen(false);
     setEditSource(undefined);
+  };
+
+  const handleDeleteRequest = (id: string) => setPendingDeleteId(id);
+  const handleDeleteConfirm = () => {
+    if (pendingDeleteId) deleteSource(pendingDeleteId);
+    setPendingDeleteId(null);
   };
 
   return (
@@ -73,7 +81,7 @@ export function SourcesPage() {
           sources={sources}
           onOpen={handleOpen}
           onEdit={handleEdit}
-          onDelete={deleteSource}
+          onDelete={handleDeleteRequest}
           onTest={testSource}
         />
       )}
@@ -82,6 +90,16 @@ export function SourcesPage() {
         open={drawerOpen}
         onClose={handleClose}
         source={editSource}
+      />
+
+      <ConfirmDialog
+        open={!!pendingDeleteId}
+        title="Delete source"
+        description={`"${sources.find((s) => s.id === pendingDeleteId)?.name}" will be permanently deleted. This action cannot be undone.`}
+        confirmLabel="Delete"
+        destructive
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setPendingDeleteId(null)}
       />
     </div>
   );
