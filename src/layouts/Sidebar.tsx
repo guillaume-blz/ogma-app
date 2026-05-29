@@ -25,12 +25,12 @@ export function Sidebar({ children }: SidebarProps) {
       defaultSize={20}
       minSize={240}
       maxSize={340}
-      className="flex flex-col bg-sidebar border-r border-sidebar-border h-full overflow-hidden"
+      className="flex flex-col bg-sidebar h-full overflow-hidden"
     >
       <div
         data-tauri-drag-region
         onMouseDown={onDragStart}
-        className={`flex h-9 shrink-0 items-center bg-titlebar border-b border-border select-none ${isMacOS ? "pl-[78px]" : "px-3"}`}
+        className={`flex h-9 shrink-0 items-center select-none ${isMacOS ? "pl-[78px]" : "px-3"}`}
       >
         <span
           data-tauri-drag-region
