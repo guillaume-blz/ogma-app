@@ -11,6 +11,7 @@ export default {
     exports: "Exports",
     sharedWithMe: "Shared with me",
     settings: "Settings",
+    search: "Search",
   },
   section: {
     data: "Data",

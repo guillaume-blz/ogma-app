@@ -11,6 +11,7 @@ export default {
     exports: "エクスポート",
     sharedWithMe: "共有アイテム",
     settings: "設定",
+    search: "検索",
   },
   section: {
     data: "データ",

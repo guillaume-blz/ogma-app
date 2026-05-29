@@ -1,4 +1,3 @@
-import { TitleBar } from "./TitleBar";
 import { Sidebar } from "./Sidebar";
 import { MainContent } from "./MainContent";
 import { WindowResizeEdges } from "./WindowResizeEdges";
@@ -21,10 +20,9 @@ export function AppLayout() {
   useShortcut("command-palette", toggle);
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden">
+    <div className="flex h-screen w-screen overflow-hidden">
       <WindowResizeEdges />
-      <TitleBar />
-      <ResizablePanelGroup orientation="horizontal" className="flex-1 overflow-hidden">
+      <ResizablePanelGroup orientation="horizontal" className="h-full overflow-hidden">
         <Sidebar>
           <SidebarNav />
         </Sidebar>

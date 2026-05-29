@@ -13,7 +13,7 @@ function resolveTab(tab: Tab, t: ReturnType<typeof import("react-i18next").useTr
   return null;
 }
 
-export function TabBar() {
+export function TabBar({ className, dragRegion }: { className?: string; dragRegion?: boolean }) {
   const { openTabs, closeTab, closeTabsWhere } = useTabStore();
   const navigate = useNavigate();
   const location = useLocation();
@@ -69,7 +69,10 @@ export function TabBar() {
   if (openTabs.length === 0) return null;
 
   return (
-    <div className="flex items-end h-9 border-b border-border bg-background shrink-0 overflow-x-auto scrollbar-none">
+    <div
+      data-tauri-drag-region={dragRegion ? "" : undefined}
+      className={cn("flex items-end h-9 border-b border-border bg-background shrink-0 overflow-x-auto scrollbar-none", className)}
+    >
       {openTabs.map((tab) => {
         const resolved = resolveTab(tab, t);
         if (!resolved) return null;

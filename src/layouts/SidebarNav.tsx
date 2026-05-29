@@ -1,9 +1,11 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Search } from "lucide-react";
 import { MenuItem } from "@/components/MenuItem";
 import { MenuTitle } from "@/components/MenuTitle";
 import { WorkspaceSwitcher } from "@/components/WorkspaceSwitcher";
 import { useTabStore } from "@/stores/tabStore";
+import { useCommandPaletteStore } from "@/stores/commandPaletteStore";
 import { navigation } from "@/app/navigation";
 import { SidebarSourcesSection } from "@/layouts/SidebarSourcesSection";
 
@@ -12,6 +14,7 @@ export function SidebarNav() {
   const location = useLocation();
   const { t } = useTranslation();
   const addTab = useTabStore((s) => s.addTab);
+  const openPalette = useCommandPaletteStore((s) => s.toggle);
 
   const handleNavClick = (id: string, path: string) => {
     addTab({ id, path });
@@ -36,6 +39,13 @@ export function SidebarNav() {
                   onClick={() => handleNavClick(item.id, item.path)}
                 />
               )
+            )}
+            {i === 0 && (
+              <MenuItem
+                icon={Search}
+                label={t("nav.search")}
+                onClick={openPalette}
+              />
             )}
           </div>
         ))}
