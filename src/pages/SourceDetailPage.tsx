@@ -10,7 +10,8 @@ import { SchemaTab } from "@/features/sources/components/detail/SchemaTab";
 import { SettingsTab } from "@/features/sources/components/detail/SettingsTab";
 import { useSourceStore } from "@/features/sources/store";
 
-const VALID_TABS: DetailTab[] = ["overview", "tables", "data", "schema", "settings"];
+const DATABASE_TABS: DetailTab[] = ["overview", "tables", "data", "schema", "settings"];
+const OTHER_TABS: DetailTab[]    = ["overview", "settings"];
 
 export function SourceDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,8 +22,9 @@ export function SourceDetailPage() {
   useEffect(() => { fetchSources(); }, [fetchSources]);
 
   const source = sources.find((s) => s.id === id);
+  const validTabs = source?.source_type === "database" ? DATABASE_TABS : OTHER_TABS;
   const rawTab = searchParams.get("tab") ?? "overview";
-  const activeTab: DetailTab = VALID_TABS.includes(rawTab as DetailTab)
+  const activeTab: DetailTab = validTabs.includes(rawTab as DetailTab)
     ? (rawTab as DetailTab)
     : "overview";
 
@@ -62,7 +64,7 @@ export function SourceDetailPage() {
         </div>
       </div>
 
-      <SourceDetailTabs active={activeTab} onChange={changeTab} />
+      <SourceDetailTabs active={activeTab} sourceType={source.source_type} onChange={changeTab} />
 
       <div>
         {activeTab === "overview"  && <OverviewTab source={source} />}

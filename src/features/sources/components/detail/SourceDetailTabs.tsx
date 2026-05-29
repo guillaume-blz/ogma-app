@@ -1,24 +1,28 @@
 import { cn } from "@/lib/utils";
+import type { SourceType } from "../../types";
 
 export type DetailTab = "overview" | "tables" | "data" | "schema" | "settings";
 
-const TABS: { id: DetailTab; label: string }[] = [
-  { id: "overview", label: "Overview" },
-  { id: "tables",   label: "Tables"   },
-  { id: "data",     label: "Data"     },
-  { id: "schema",   label: "Schema"   },
-  { id: "settings", label: "Settings" },
+const ALL_TABS: { id: DetailTab; label: string; databaseOnly: boolean }[] = [
+  { id: "overview", label: "Overview", databaseOnly: false },
+  { id: "tables",   label: "Tables",   databaseOnly: true  },
+  { id: "data",     label: "Data",     databaseOnly: true  },
+  { id: "schema",   label: "Schema",   databaseOnly: true  },
+  { id: "settings", label: "Settings", databaseOnly: false },
 ];
 
 interface SourceDetailTabsProps {
   active: DetailTab;
+  sourceType: SourceType;
   onChange: (tab: DetailTab) => void;
 }
 
-export function SourceDetailTabs({ active, onChange }: SourceDetailTabsProps) {
+export function SourceDetailTabs({ active, sourceType, onChange }: SourceDetailTabsProps) {
+  const tabs = ALL_TABS.filter((t) => !t.databaseOnly || sourceType === "database");
+
   return (
     <div className="flex gap-1 border-b border-border">
-      {TABS.map((tab) => (
+      {tabs.map((tab) => (
         <button
           key={tab.id}
           type="button"
