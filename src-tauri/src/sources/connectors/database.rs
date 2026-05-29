@@ -123,7 +123,13 @@ impl super::Connector for DatabaseConnector {
 
     async fn execute_query(&self, query: AbstractQuery) -> Result<QueryResult, ConnectorError> {
         let (pool, _tunnel) = self.connect().await?;
-        let (sql, args) = build_query(&query, &self.config.driver)?;
+
+        let (sql, args) = match &self.config.driver {
+            DatabaseDriver::Mysql | DatabaseDriver::Mariadb => {
+                build_mysql_query(&pool, &query, &self.config.database).await?
+            }
+            _ => build_query(&query, &self.config.driver)?,
+        };
 
         let rows = sqlx::query_with(&sql, args)
             .fetch_all(&pool)
@@ -147,6 +153,74 @@ impl super::Connector for DatabaseConnector {
 
 // ── SQL builder ───────────────────────────────────────────────────────────────
 
+// Returns the CAST target for MySQL types unsupported by the Any driver, or None.
+fn mysql_cast_target(dtype: &str) -> Option<&'static str> {
+    match dtype.to_lowercase().as_str() {
+        "tinyint" => Some("SIGNED"),
+        "datetime" | "date" | "time" | "timestamp" | "year" => Some("CHAR"),
+        _ => None,
+    }
+}
+
+// For MySQL/MariaDB: cast Any-driver-incompatible types so fetch_all never fails.
+async fn build_mysql_query(
+    pool: &sqlx::AnyPool,
+    query: &AbstractQuery,
+    database: &str,
+) -> Result<(String, AnyArguments<'static>), ConnectorError> {
+    let schema_sql = format!(
+        "SELECT column_name, data_type \
+         FROM information_schema.columns \
+         WHERE table_schema = '{}' AND table_name = '{}' \
+         ORDER BY ordinal_position",
+        database.replace('\'', "\\'"),
+        query.table.replace('\'', "\\'"),
+    );
+    let schema_rows = sqlx::query(&schema_sql)
+        .fetch_all(pool)
+        .await
+        .map_err(|e| ConnectorError::Query(e.to_string()))?;
+
+    let col_types: Vec<(String, Option<&'static str>)> = schema_rows
+        .iter()
+        .filter_map(|r| {
+            let name: String = r.try_get("column_name").ok()?;
+            let dtype: String = r.try_get("data_type").ok()?;
+            Some((name, mysql_cast_target(&dtype)))
+        })
+        .collect();
+
+    let selected: Vec<(String, Option<&'static str>)> = match &query.columns {
+        Some(cols) => cols
+            .iter()
+            .map(|c| {
+                let cast = col_types.iter().find(|(n, _)| n == c).and_then(|(_, t)| *t);
+                (c.clone(), cast)
+            })
+            .collect(),
+        None => col_types,
+    };
+
+    let col_exprs: Vec<String> = selected
+        .iter()
+        .map(|(name, cast)| {
+            let q = format!("`{}`", sanitize_id(name));
+            match cast {
+                Some(target) => format!("CAST({} AS {}) AS {}", q, target, q),
+                None => q,
+            }
+        })
+        .collect();
+
+    let cols_sql = if col_exprs.is_empty() {
+        "*".to_string()
+    } else {
+        col_exprs.join(", ")
+    };
+
+    build_query_with_cols(&cols_sql, query, &DatabaseDriver::Mysql)
+}
+
 fn build_query(query: &AbstractQuery, driver: &DatabaseDriver) -> Result<(String, AnyArguments<'static>), ConnectorError> {
     let quote_ident = |name: &str| -> String {
         let s = sanitize_id(name);
@@ -155,14 +229,24 @@ fn build_query(query: &AbstractQuery, driver: &DatabaseDriver) -> Result<(String
             _ => format!("\"{}\"", s),
         }
     };
-
     let cols = query
         .columns
         .as_ref()
         .map(|c| c.iter().map(|col| quote_ident(col)).collect::<Vec<_>>().join(", "))
         .unwrap_or_else(|| "*".to_string());
+    build_query_with_cols(&cols, query, driver)
+}
 
-    let mut sql = format!("SELECT {} FROM {}", cols, quote_ident(&query.table));
+fn build_query_with_cols(cols_sql: &str, query: &AbstractQuery, driver: &DatabaseDriver) -> Result<(String, AnyArguments<'static>), ConnectorError> {
+    let quote_ident = |name: &str| -> String {
+        let s = sanitize_id(name);
+        match driver {
+            DatabaseDriver::Mysql | DatabaseDriver::Mariadb => format!("`{}`", s),
+            _ => format!("\"{}\"", s),
+        }
+    };
+
+    let mut sql = format!("SELECT {} FROM {}", cols_sql, quote_ident(&query.table));
     let mut args = AnyArguments::default();
 
     if !query.filters.is_empty() {
@@ -246,15 +330,28 @@ fn map_any_row(row: &AnyRow) -> Vec<serde_json::Value> {
                 // Postgres integers
                 "INT2" | "INT4" | "INT8" | "OID" |
                 // MySQL / MariaDB integers
-                "BIGINT" | "INT" | "MEDIUMINT" | "SMALLINT" | "TINYINT" |
+                "BIGINT" | "INT" | "MEDIUMINT" | "SMALLINT" |
                 // MariaDB extras
                 "BIGINT UNSIGNED" | "INT UNSIGNED" | "MEDIUMINT UNSIGNED" |
-                "SMALLINT UNSIGNED" | "TINYINT UNSIGNED" |
+                "SMALLINT UNSIGNED" |
                 // SQLite
                 "INTEGER" => row
                     .try_get::<i64, _>(i)
                     .map(serde_json::Value::from)
                     .unwrap_or(serde_json::Value::Null),
+                // MySQL TINYINT: the Any driver maps TINYINT(1) as bool internally
+                "TINYINT" | "TINYINT UNSIGNED" => {
+                    if let Ok(b) = row.try_get::<bool, _>(i) {
+                        serde_json::Value::from(b as i64)
+                    } else if let Ok(n) = row.try_get::<i64, _>(i) {
+                        serde_json::Value::from(n)
+                    } else {
+                        row.try_get::<String, _>(i)
+                            .ok()
+                            .and_then(|s| s.parse::<i64>().ok().map(serde_json::Value::from))
+                            .unwrap_or(serde_json::Value::Null)
+                    }
+                },
                 // Postgres floats
                 "FLOAT4" | "FLOAT8" | "NUMERIC" |
                 // MySQL floats
