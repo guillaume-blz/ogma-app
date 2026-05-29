@@ -33,10 +33,10 @@ export function getKeys(id: ShortcutId): string | undefined {
 export function formatDisplay(keys: string): string {
   if (isMac()) {
     return keys
-      .replace("Meta+", "⌘")
+      .replace("Cmd+", "⌘")
       .replace("Shift+", "⇧")
       .replace("Alt+", "⌥")
       .replace("Ctrl+", "⌃");
   }
-  return keys.replace("Meta+", "Win+");
+  return keys.replace("Cmd+", "Ctrl+").replace("Meta+", "Win+");
 }

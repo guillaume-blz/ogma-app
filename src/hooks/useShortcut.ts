@@ -9,7 +9,7 @@ function matchesKeys(event: KeyboardEvent, keys: string): boolean {
 
   return (
     event.key.toLowerCase() === key &&
-    event.metaKey === modifiers.includes("meta") &&
+    event.metaKey === modifiers.includes("cmd") &&
     event.ctrlKey === modifiers.includes("ctrl") &&
     event.shiftKey === modifiers.includes("shift") &&
     event.altKey === modifiers.includes("alt")

@@ -2,31 +2,38 @@
   "shortcuts": [
     {
       "id": "command-palette",
-      "mac": "Meta+K",
+      "mac": "Cmd+K",
       "win": "Ctrl+K",
       "scope": "app",
       "labelKey": "shortcuts.commandPalette"
     },
     {
       "id": "close-tab",
-      "mac": "Meta+W",
+      "mac": "Cmd+W",
       "win": "Ctrl+W",
       "scope": "app",
       "labelKey": "shortcuts.closeTab"
     },
     {
       "id": "new-tab",
-      "mac": "Meta+T",
+      "mac": "Cmd+T",
       "win": "Ctrl+T",
       "scope": "app",
       "labelKey": "shortcuts.newTab"
     },
     {
       "id": "open-settings",
-      "mac": "Meta+,",
+      "mac": "Cmd+,",
       "win": "Ctrl+,",
       "scope": "app",
       "labelKey": "shortcuts.openSettings"
+    },
+    {
+      "id": "toggle-sidebar",
+      "mac": "Cmd+B",
+      "win": "Ctrl+B",
+      "scope": "app",
+      "labelKey": "shortcuts.toggleSidebar"
     }
   ]
 }
