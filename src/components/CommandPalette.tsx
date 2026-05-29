@@ -6,7 +6,7 @@ import { Search, Database, FileText, Globe, Cloud } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCommandPaletteStore } from "@/stores/commandPaletteStore";
-import { useSourceStore } from "@/features/sources/store";
+import { useSourcesQuery } from "@/features/sources/hooks/useSourcesQuery";
 import { useTabStore } from "@/stores/tabStore";
 import { navItemsFlat } from "@/app/navigation";
 import type { SourceType } from "@/features/sources/types";
@@ -37,17 +37,15 @@ export function CommandPalette() {
 
   const navigate = useNavigate();
   const addTab = useTabStore((s) => s.addTab);
-  const sources = useSourceStore((s) => s.sources);
-  const fetchSources = useSourceStore((s) => s.fetchSources);
+  const { data: sources = [] } = useSourcesQuery();
 
   useEffect(() => {
     if (open) {
       setQuery("");
       setActiveIndex(0);
-      fetchSources();
       inputRef.current?.focus();
     }
-  }, [open, fetchSources]);
+  }, [open]);
 
   const goTo = useCallback(
     (id: string, path: string, label?: string) => {

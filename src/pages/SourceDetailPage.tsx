@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { SourceTypeIcon } from "@/features/sources/components/SourceTypeIcon";
@@ -8,7 +7,7 @@ import { TablesTab } from "@/features/sources/components/detail/TablesTab";
 import { DataTab } from "@/features/sources/components/detail/DataTab";
 import { SchemaTab } from "@/features/sources/components/detail/SchemaTab";
 import { SettingsTab } from "@/features/sources/components/detail/SettingsTab";
-import { useSourceStore } from "@/features/sources/store";
+import { useSourcesQuery } from "@/features/sources/hooks/useSourcesQuery";
 
 const DATABASE_TABS: DetailTab[] = ["overview", "tables", "data", "schema", "settings"];
 const OTHER_TABS: DetailTab[]    = ["overview", "settings"];
@@ -17,9 +16,7 @@ export function SourceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { sources, loading, fetchSources } = useSourceStore();
-
-  useEffect(() => { fetchSources(); }, [fetchSources]);
+  const { data: sources = [], isLoading } = useSourcesQuery();
 
   const source = sources.find((s) => s.id === id);
   const validTabs = source?.source_type === "database" ? DATABASE_TABS : OTHER_TABS;
@@ -28,13 +25,13 @@ export function SourceDetailPage() {
     ? (rawTab as DetailTab)
     : "overview";
 
-  if (loading && !source) return (
+  if (isLoading && !source) return (
     <div className="flex items-center gap-2 py-16 text-sm text-muted-foreground">
       <Loader2 className="size-4 animate-spin" /> Loading…
     </div>
   );
 
-  if (!loading && !source) {
+  if (!isLoading && !source) {
     navigate("/sources", { replace: true });
     return null;
   }

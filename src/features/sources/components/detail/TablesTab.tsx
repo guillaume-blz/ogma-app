@@ -1,25 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ChevronRight, Loader2, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSourceStore } from "../../store";
-import type { Schema, TableSchema } from "../../types";
+import { useSourceSchema } from "../../hooks/useSourceSchema";
+import type { TableSchema } from "../../types";
 
 export function TablesTab({ sourceId }: { sourceId: string }) {
-  const { fetchSchema } = useSourceStore();
-  const [schema, setSchema] = useState<Schema | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: schema, isLoading, error } = useSourceSchema(sourceId);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [, setSearchParams] = useSearchParams();
-
-  useEffect(() => {
-    setLoading(true);
-    fetchSchema(sourceId)
-      .then(setSchema)
-      .catch((e) => setError(String(e)))
-      .finally(() => setLoading(false));
-  }, [sourceId, fetchSchema]);
 
   const toggle = (name: string) =>
     setExpanded((s) => {
@@ -28,12 +17,12 @@ export function TablesTab({ sourceId }: { sourceId: string }) {
       return next;
     });
 
-  if (loading) return (
+  if (isLoading) return (
     <div className="flex items-center gap-2 text-sm text-muted-foreground py-8">
       <Loader2 className="size-4 animate-spin" /> Loading tables…
     </div>
   );
-  if (error) return <p className="text-sm text-destructive py-4">{error}</p>;
+  if (error) return <p className="text-sm text-destructive py-4">{String(error)}</p>;
   if (!schema || schema.tables.length === 0) return (
     <p className="text-sm text-muted-foreground py-4">No tables found.</p>
   );

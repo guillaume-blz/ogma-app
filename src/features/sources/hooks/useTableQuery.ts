@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { useSourceStore } from "../store";
+import { useQuery } from "@tanstack/react-query";
+import { invoke } from "@tauri-apps/api/core";
+import { sourceKeys } from "../query-keys";
 import type { QueryResult, OrderBy } from "../types";
 
 export const PAGE_SIZES = [25, 50, 100] as const;
@@ -11,42 +13,29 @@ interface UseTableQueryOptions {
 }
 
 export function useTableQuery({ sourceId, table }: UseTableQueryOptions) {
-  const querySource = useSourceStore((s) => s.querySource);
-
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState<PageSize>(50);
   const [orderBy, setOrderBy] = useState<OrderBy | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<QueryResult | null>(null);
 
-  // Reset pagination and sort when the table changes
   useEffect(() => {
     setPage(1);
     setOrderBy(null);
-    setResult(null);
-    setError(null);
   }, [table]);
 
-  useEffect(() => {
-    if (!table) return;
-    let cancelled = false;
-
-    setLoading(true);
-    setError(null);
-
-    querySource(sourceId, {
-      table,
-      limit: pageSize,
-      offset: (page - 1) * pageSize,
-      order_by: orderBy ? [orderBy] : undefined,
-    })
-      .then((res) => { if (!cancelled) setResult(res); })
-      .catch((e) => { if (!cancelled) setError(String(e)); })
-      .finally(() => { if (!cancelled) setLoading(false); });
-
-    return () => { cancelled = true; };
-  }, [sourceId, table, page, pageSize, orderBy, querySource]);
+  const query = useQuery({
+    queryKey: sourceKeys.tableData(sourceId, table ?? "", page, pageSize, orderBy),
+    queryFn: () =>
+      invoke<QueryResult>("source_query", {
+        id: sourceId,
+        query: {
+          table: table!,
+          limit: pageSize,
+          offset: (page - 1) * pageSize,
+          order_by: orderBy ? [orderBy] : undefined,
+        },
+      }),
+    enabled: !!table,
+  });
 
   const toggleOrder = useCallback((column: string) => {
     setOrderBy((prev) => {
@@ -62,18 +51,15 @@ export function useTableQuery({ sourceId, table }: UseTableQueryOptions) {
     setPage(1);
   }, []);
 
-  const refresh = useCallback(() => {
-    // Force re-run by bumping a counter via a no-op page set
-    setPage((p) => p);
-  }, []);
-
   const totalPages =
-    result?.total != null ? Math.max(1, Math.ceil(result.total / pageSize)) : null;
+    query.data?.total != null
+      ? Math.max(1, Math.ceil(query.data.total / pageSize))
+      : null;
 
   return {
-    loading,
-    error,
-    result,
+    loading: query.isFetching,
+    error: query.error ? String(query.error) : null,
+    result: query.data ?? null,
     page,
     pageSize,
     orderBy,
@@ -81,6 +67,6 @@ export function useTableQuery({ sourceId, table }: UseTableQueryOptions) {
     setPage,
     setPageSize: setPageSizeSafe,
     toggleOrder,
-    refresh,
+    refresh: query.refetch,
   };
 }

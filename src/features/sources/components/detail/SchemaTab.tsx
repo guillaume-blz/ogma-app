@@ -1,28 +1,15 @@
-import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
-import { useSourceStore } from "../../store";
-import type { Schema } from "../../types";
+import { useSourceSchema } from "../../hooks/useSourceSchema";
 
 export function SchemaTab({ sourceId }: { sourceId: string }) {
-  const { fetchSchema } = useSourceStore();
-  const [schema, setSchema] = useState<Schema | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: schema, isLoading, error } = useSourceSchema(sourceId);
 
-  useEffect(() => {
-    setLoading(true);
-    fetchSchema(sourceId)
-      .then(setSchema)
-      .catch((e) => setError(String(e)))
-      .finally(() => setLoading(false));
-  }, [sourceId, fetchSchema]);
-
-  if (loading) return (
+  if (isLoading) return (
     <div className="flex items-center gap-2 text-sm text-muted-foreground py-8">
       <Loader2 className="size-4 animate-spin" /> Loading schema…
     </div>
   );
-  if (error) return <p className="text-sm text-destructive py-4">{error}</p>;
+  if (error) return <p className="text-sm text-destructive py-4">{String(error)}</p>;
   if (!schema || schema.tables.length === 0) return (
     <p className="text-sm text-muted-foreground py-4">No schema found.</p>
   );
