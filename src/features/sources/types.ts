@@ -1,6 +1,12 @@
 export type SourceType = "database" | "files" | "api" | "saas";
 
-export type DatabaseDriver = "postgres" | "mysql" | "sqlite";
+export type DatabaseDriver = "postgres" | "mysql" | "mariadb" | "sqlite";
+
+export interface DatabaseDriverMeta {
+  value: DatabaseDriver;
+  label: string;
+  default_port: number;
+}
 
 export type SshAuthType = "password" | "key";
 

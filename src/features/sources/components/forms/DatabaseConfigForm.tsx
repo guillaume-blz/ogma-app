@@ -5,13 +5,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import type { DatabaseConfig, DatabaseDriver } from "../../types";
+import { useDatabaseDrivers } from "../../hooks/useDatabaseDrivers";
 import { SshTunnelForm } from "./SshTunnelForm";
-
-const DEFAULT_PORTS: Record<DatabaseDriver, number> = {
-  postgres: 5432,
-  mysql: 3306,
-  sqlite: 0,
-};
 
 interface DatabaseConfigFormProps {
   value: Partial<DatabaseConfig>;
@@ -22,11 +17,14 @@ interface DatabaseConfigFormProps {
 export function DatabaseConfigForm({ value, onChange, onTest }: DatabaseConfigFormProps) {
   const [testing, setTesting] = useState(false);
   const [testResult, setTestResult] = useState<"ok" | "error" | null>(null);
+  const drivers = useDatabaseDrivers();
 
   const set = (patch: Partial<DatabaseConfig>) => onChange({ ...value, ...patch });
 
-  const handleDriverChange = (driver: DatabaseDriver) =>
-    set({ driver, port: DEFAULT_PORTS[driver] });
+  const handleDriverChange = (driver: DatabaseDriver) => {
+    const meta = drivers.find((d) => d.value === driver);
+    set({ driver, port: meta?.default_port ?? 0 });
+  };
 
   const handleTest = async () => {
     if (!onTest) return;
@@ -53,9 +51,9 @@ export function DatabaseConfigForm({ value, onChange, onTest }: DatabaseConfigFo
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="postgres">PostgreSQL</SelectItem>
-            <SelectItem value="mysql">MySQL</SelectItem>
-            <SelectItem value="sqlite">SQLite</SelectItem>
+            {drivers.map((d) => (
+              <SelectItem key={d.value} value={d.value}>{d.label}</SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </Field>

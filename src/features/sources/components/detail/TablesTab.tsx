@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { useSearchParams } from "react-router-dom";
+import { ChevronRight, Loader2, Table2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSourceStore } from "../../store";
 import type { Schema, TableSchema } from "../../types";
@@ -10,6 +11,7 @@ export function TablesTab({ sourceId }: { sourceId: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [, setSearchParams] = useSearchParams();
 
   useEffect(() => {
     setLoading(true);
@@ -36,6 +38,10 @@ export function TablesTab({ sourceId }: { sourceId: string }) {
     <p className="text-sm text-muted-foreground py-4">No tables found.</p>
   );
 
+  const openData = (tableName: string) => {
+    setSearchParams({ tab: "data", table: tableName });
+  };
+
   return (
     <div className="max-w-2xl space-y-1">
       <p className="mb-3 text-xs text-muted-foreground">
@@ -47,26 +53,48 @@ export function TablesTab({ sourceId }: { sourceId: string }) {
           table={table}
           open={expanded.has(table.name)}
           onToggle={() => toggle(table.name)}
+          onOpenData={() => openData(table.name)}
         />
       ))}
     </div>
   );
 }
 
-function TableRow({ table, open, onToggle }: { table: TableSchema; open: boolean; onToggle: () => void }) {
+function TableRow({
+  table,
+  open,
+  onToggle,
+  onOpenData,
+}: {
+  table: TableSchema;
+  open: boolean;
+  onToggle: () => void;
+  onOpenData: () => void;
+}) {
   return (
     <div className="rounded-lg border border-border overflow-hidden">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex w-full items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/40 transition-colors"
-      >
-        <ChevronRight className={cn("size-3.5 text-muted-foreground transition-transform shrink-0", open && "rotate-90")} />
-        <span className="font-mono text-sm font-medium">{table.name}</span>
-        <span className="ml-auto text-xs text-muted-foreground">
-          {table.columns.length} col{table.columns.length !== 1 ? "s" : ""}
-        </span>
-      </button>
+      <div className="flex w-full items-center hover:bg-muted/40 transition-colors">
+        <button
+          type="button"
+          onClick={onToggle}
+          className="flex flex-1 items-center gap-2 px-4 py-2.5 text-left"
+        >
+          <ChevronRight className={cn("size-3.5 text-muted-foreground transition-transform shrink-0", open && "rotate-90")} />
+          <span className="font-mono text-sm font-medium">{table.name}</span>
+          <span className="ml-auto text-xs text-muted-foreground">
+            {table.columns.length} col{table.columns.length !== 1 ? "s" : ""}
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={onOpenData}
+          className="flex items-center justify-center px-3 py-2.5 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label={`View data for ${table.name}`}
+          title="View data"
+        >
+          <Table2 className="size-3.5" />
+        </button>
+      </div>
       {open && (
         <div className="border-t border-border">
           {table.columns.map((col) => (

@@ -51,7 +51,26 @@ pub struct Source {
 pub enum DatabaseDriver {
     Postgres,
     Mysql,
+    Mariadb,
     Sqlite,
+}
+
+#[derive(Debug, Serialize)]
+pub struct DatabaseDriverMeta {
+    pub value: &'static str,
+    pub label: &'static str,
+    pub default_port: u16,
+}
+
+impl DatabaseDriver {
+    pub fn all() -> Vec<DatabaseDriverMeta> {
+        vec![
+            DatabaseDriverMeta { value: "postgres", label: "PostgreSQL", default_port: 5432 },
+            DatabaseDriverMeta { value: "mysql",    label: "MySQL",      default_port: 3306 },
+            DatabaseDriverMeta { value: "mariadb",  label: "MariaDB",    default_port: 3306 },
+            DatabaseDriverMeta { value: "sqlite",   label: "SQLite",     default_port: 0    },
+        ]
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -96,7 +115,7 @@ impl DatabaseConfig {
                 "postgresql://{}:{}@{}:{}/{}",
                 self.username, self.password, host, port, self.database
             ),
-            DatabaseDriver::Mysql => format!(
+            DatabaseDriver::Mysql | DatabaseDriver::Mariadb => format!(
                 "mysql://{}:{}@{}:{}/{}",
                 self.username, self.password, host, port, self.database
             ),

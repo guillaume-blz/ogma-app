@@ -34,6 +34,7 @@ pub fn run() {
             source_schema,
             source_query,
             source_test_ssh,
+            source_database_drivers,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

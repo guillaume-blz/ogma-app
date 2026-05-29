@@ -68,7 +68,7 @@ impl super::Connector for DatabaseConnector {
                  WHERE c.table_schema = 'public' AND t.table_type = 'BASE TABLE' \
                  ORDER BY c.table_name, c.ordinal_position"
                     .to_string(),
-            DatabaseDriver::Mysql => format!(
+            DatabaseDriver::Mysql | DatabaseDriver::Mariadb => format!(
                 "SELECT c.table_name, c.column_name, c.data_type, c.is_nullable \
                  FROM information_schema.columns c \
                  JOIN information_schema.tables t \
@@ -151,7 +151,7 @@ fn build_query(query: &AbstractQuery, driver: &DatabaseDriver) -> Result<(String
     let quote_ident = |name: &str| -> String {
         let s = sanitize_id(name);
         match driver {
-            DatabaseDriver::Mysql => format!("`{}`", s),
+            DatabaseDriver::Mysql | DatabaseDriver::Mariadb => format!("`{}`", s),
             _ => format!("\"{}\"", s),
         }
     };
@@ -245,8 +245,11 @@ fn map_any_row(row: &AnyRow) -> Vec<serde_json::Value> {
             match type_name.as_str() {
                 // Postgres integers
                 "INT2" | "INT4" | "INT8" | "OID" |
-                // MySQL integers
+                // MySQL / MariaDB integers
                 "BIGINT" | "INT" | "MEDIUMINT" | "SMALLINT" | "TINYINT" |
+                // MariaDB extras
+                "BIGINT UNSIGNED" | "INT UNSIGNED" | "MEDIUMINT UNSIGNED" |
+                "SMALLINT UNSIGNED" | "TINYINT UNSIGNED" |
                 // SQLite
                 "INTEGER" => row
                     .try_get::<i64, _>(i)
