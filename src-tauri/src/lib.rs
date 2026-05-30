@@ -14,6 +14,15 @@ fn greet(name: &str) -> String {
     format!("Hello, {}! You've been greeted from Rust!", name)
 }
 
+#[tauri::command]
+fn set_window_theme(window: tauri::WebviewWindow, theme: String) {
+    let t = match theme.as_str() {
+        "dark" => tauri::Theme::Dark,
+        _ => tauri::Theme::Light,
+    };
+    let _ = window.set_theme(Some(t));
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -53,6 +62,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             greet,
+            set_window_theme,
             source_list,
             source_create,
             source_update,

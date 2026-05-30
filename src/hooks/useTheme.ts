@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { invoke } from "@tauri-apps/api/core";
 import { useThemeStore } from "@/stores/themeStore";
 import { getTheme } from "@/themes";
 
@@ -11,6 +12,7 @@ function applyTheme(themeId: string, isDark: boolean) {
   }
   root.classList.toggle("dark", isDark);
   root.classList.toggle("light", !isDark);
+  invoke("set_window_theme", { theme: isDark ? "dark" : "light" }).catch(() => {});
 }
 
 export function useTheme() {
