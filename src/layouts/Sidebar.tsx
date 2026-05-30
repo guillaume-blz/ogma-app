@@ -1,16 +1,16 @@
 import type { ReactNode, MouseEvent, Ref } from "react";
 import { Panel } from "react-resizable-panels";
-import type { ImperativePanelHandle } from "react-resizable-panels";
+import type { PanelImperativeHandle } from "react-resizable-panels";
 import { PanelRightClose } from "lucide-react";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Kbd } from "@/components/ui/kbd";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { useSidebarStore } from "@/stores/sidebarStore";
 import { getKeys, formatDisplay } from "@/shortcuts";
+import {useSidebarStore} from "@/stores/sidebarStore.ts";
 
 interface SidebarProps {
   children?: ReactNode;
-  panelRef?: Ref<ImperativePanelHandle>;
+  panelRef?: Ref<PanelImperativeHandle>;
   onCollapse?: () => void;
   onExpand?: () => void;
 }

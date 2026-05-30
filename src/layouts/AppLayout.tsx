@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import type { ImperativePanelHandle } from "react-resizable-panels";
+import type { PanelImperativeHandle } from "react-resizable-panels";
 import { Sidebar } from "./Sidebar";
 import { MainContent } from "./MainContent";
 import { WindowResizeEdges } from "./WindowResizeEdges";
@@ -27,7 +27,7 @@ export function AppLayout() {
   const toggle = useCommandPaletteStore((s) => s.toggle);
   useShortcut("command-palette", toggle);
 
-  const sidebarPanelRef = useRef<ImperativePanelHandle>(null);
+  const sidebarPanelRef = useRef<PanelImperativeHandle>(null);
   const sidebarOpen = useSidebarStore((s) => s.open);
   const setOpen = useSidebarStore((s) => s.setOpen);
   const toggleSidebar = useSidebarStore((s) => s.toggle);
@@ -49,13 +49,17 @@ export function AppLayout() {
     <div className="flex h-screen w-screen overflow-hidden">
       <WindowResizeEdges />
       <ResizablePanelGroup orientation="horizontal" className="h-full overflow-hidden">
-        <Sidebar
-          panelRef={sidebarPanelRef}
-          onCollapse={() => setOpen(false)}
-          onExpand={() => setOpen(true)}
-        >
-          <SidebarNav />
-        </Sidebar>
+        {sidebarOpen && (
+          <>
+            <Sidebar
+              panelRef={sidebarPanelRef}
+              onCollapse={() => setOpen(false)}
+              onExpand={() => setOpen(true)}
+            >
+              <SidebarNav />
+            </Sidebar>
+          </>
+        )}
         <ResizableHandle withHandle className="bg-transparent" />
         <MainContent />
       </ResizablePanelGroup>

@@ -31,19 +31,19 @@ export function TitleBar() {
       onMouseDown={onDragStart}
       className="flex h-9 shrink-0 items-end bg-titlebar border-b border-border select-none"
     >
-      <div className={`flex h-full shrink-0 items-center ${isMacOS ? "pl-[78px] pr-1" : "pl-1"}`}>
-        {!sidebarOpen && (
-          <Tooltip content={<>Toggle sidebar <Kbd>{formatDisplay(getKeys("toggle-sidebar") ?? "")}</Kbd></>} side="right">
+      {!sidebarOpen && (
+        <div className={`flex h-full shrink-0 items-center ${isMacOS ? "pl-[78px] pr-1" : "pl-1"}`}>
+          <Tooltip content={<>Toggle sidebar <Kbd>{formatDisplay(getKeys("toggle-sidebar") ?? "")}</Kbd></>} side="bottom">
             <button
               onClick={toggleSidebar}
               className="flex items-center justify-center rounded p-1.5 text-titlebar-foreground/50 hover:text-titlebar-foreground hover:bg-sidebar-accent transition-colors"
-              aria-label="Open sidebar"
+              aria-label="Toggle sidebar"
             >
               <PanelRightOpen className="h-4 w-4 rotate-180" />
             </button>
           </Tooltip>
-        )}
-      </div>
+        </div>
+      )}
       <TabBar className="flex-1 shrink h-full bg-transparent border-none" dragRegion />
       {!isMacOS && (
         <div className="flex h-full shrink-0">
