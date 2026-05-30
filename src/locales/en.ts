@@ -68,5 +68,16 @@ export default {
         description: "Theme used in dark mode",
       },
     },
+    fonts: {
+      sectionTitle: "Fonts",
+      uiFont: {
+        label: "Interface font",
+        description: "Font used for the UI. Leave empty to use the OS default.",
+      },
+      codeFont: {
+        label: "Code font",
+        description: "Font used in code blocks and editors.",
+      },
+    },
   },
 } as const;

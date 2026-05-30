@@ -68,5 +68,16 @@ export default {
         description: "ダークモードで使用するテーマ",
       },
     },
+    fonts: {
+      sectionTitle: "フォント",
+      uiFont: {
+        label: "UIフォント",
+        description: "インターフェースに使用するフォント。空欄 = OSデフォルト。",
+      },
+      codeFont: {
+        label: "コードフォント",
+        description: "コードブロックやエディターに使用するフォント。",
+      },
+    },
   },
 } as const;

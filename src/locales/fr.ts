@@ -68,5 +68,16 @@ export default {
         description: "Thème utilisé en mode sombre",
       },
     },
+    fonts: {
+      sectionTitle: "Polices",
+      uiFont: {
+        label: "Police de l'interface",
+        description: "Police utilisée pour l'interface. Vide = police de l'OS.",
+      },
+      codeFont: {
+        label: "Police du code",
+        description: "Police utilisée dans les blocs de code et éditeurs.",
+      },
+    },
   },
 } as const;

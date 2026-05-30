@@ -5,6 +5,7 @@ import { SettingsSection } from "@/components/SettingsSection";
 import { SettingsRow } from "@/components/SettingsRow";
 import { ThemeModeToggle } from "@/components/ThemeModeToggle";
 import { ThemeSelect } from "@/components/ThemeSelect";
+import { FontSelect } from "@/components/FontSelect";
 import {
   Select,
   SelectContent,
@@ -73,6 +74,21 @@ export function SettingsPage() {
           description={t("settings.appearance.darkTheme.description")}
         >
           <ThemeSelect type="dark" />
+        </SettingsRow>
+      </SettingsSection>
+
+      <SettingsSection title={t("settings.fonts.sectionTitle")}>
+        <SettingsRow
+          label={t("settings.fonts.uiFont.label")}
+          description={t("settings.fonts.uiFont.description")}
+        >
+          <FontSelect type="ui" />
+        </SettingsRow>
+        <SettingsRow
+          label={t("settings.fonts.codeFont.label")}
+          description={t("settings.fonts.codeFont.description")}
+        >
+          <FontSelect type="code" />
         </SettingsRow>
       </SettingsSection>
 

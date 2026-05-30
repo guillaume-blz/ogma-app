@@ -177,6 +177,10 @@
 
   body {
     @apply text-foreground;
-    font-family: "Geist Variable", system-ui, sans-serif;
+    font-family: var(--font-ui, system-ui, sans-serif);
+  }
+
+  code, pre, kbd, samp {
+    font-family: var(--font-code, monospace);
   }
 }
