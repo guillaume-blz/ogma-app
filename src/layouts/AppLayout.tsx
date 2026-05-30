@@ -43,7 +43,7 @@ export function AppLayout() {
             <Sidebar>
               <SidebarNav />
             </Sidebar>
-            <ResizableHandle withHandle />
+            <ResizableHandle withHandle className="bg-transparent" />
           </>
         )}
         <MainContent />
