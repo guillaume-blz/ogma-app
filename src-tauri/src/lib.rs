@@ -6,6 +6,8 @@ mod sources;
 use tauri::Manager;
 
 use sources::commands::*;
+use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, apply_liquid_glass, NSGlassEffectViewStyle};
+
 
 #[tauri::command]
 fn greet(name: &str) -> String {
@@ -22,6 +24,31 @@ pub fn run() {
             let db = tauri::async_runtime::block_on(db::init(app.handle()))
                 .expect("failed to initialize database");
             app.manage(state::AppState { db });
+
+            let window = app.get_webview_window("main").expect("failed to get main window");
+
+            // #[cfg(target_os = "macos")]
+            // {
+            //     apply_liquid_glass(&window, NSGlassEffectViewStyle::Clear, None, Some(26.0))
+            //         .expect(
+            //             "Unsupported platform! 'apply_liquid_glass' is only supported on macOS 26+",
+            //         );
+            // }
+
+
+            #[cfg(target_os = "macos")]
+            {
+                use window_vibrancy::{apply_vibrancy, NSVisualEffectMaterial, NSVisualEffectState};
+                apply_vibrancy(&window, NSVisualEffectMaterial::Sidebar, Some(NSVisualEffectState::Active), None)
+                    .expect("failed to apply vibrancy");
+            }
+
+            #[cfg(target_os = "windows")]
+            {
+                use window_vibrancy::apply_acrylic;
+                let _ = apply_acrylic(&window, Some((0, 0, 0, 50)));
+            }
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

@@ -169,10 +169,11 @@
     @apply h-full w-full overflow-hidden;
     margin: 0;
     padding: 0;
+    background: transparent;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
     font-family: "Geist Variable", system-ui, sans-serif;
   }
 }

@@ -31,7 +31,7 @@ export function Sidebar({ children }: SidebarProps) {
       defaultSize={20}
       minSize={240}
       maxSize={340}
-      className="flex flex-col bg-sidebar h-full overflow-hidden"
+      className="flex flex-col bg-transparent h-full overflow-hidden"
     >
       <div
         data-tauri-drag-region

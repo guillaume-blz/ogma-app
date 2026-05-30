@@ -12,12 +12,15 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "ogma-app",
         "width": 1200,
         "height": 800,
         "minWidth": 640,
         "minHeight": 480,
-        "decorations": false
+        "decorations": true,
+        "transparent": true,
+        "shadow": true
       }
     ],
     "security": {

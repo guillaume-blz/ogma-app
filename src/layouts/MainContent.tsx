@@ -4,7 +4,7 @@ import { TitleBar } from "./TitleBar";
 
 export function MainContent() {
   return (
-    <ResizablePanel defaultSize={80} className="flex flex-col h-full overflow-hidden">
+    <ResizablePanel defaultSize={80} className="flex flex-col h-full overflow-hidden bg-background">
       <TitleBar />
       <div className="flex-1 overflow-y-auto p-4">
         <Outlet />
