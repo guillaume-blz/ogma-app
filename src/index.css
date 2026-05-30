@@ -4,6 +4,7 @@
 @layer base {
   :root {
     --background: oklch(1 0 0);
+    --panel: 255 255 255 / 0.4;
     --foreground: oklch(0.145 0 0);
     --card: oklch(1 0 0);
     --card-foreground: oklch(0.145 0 0);
@@ -64,6 +65,7 @@
   @media (prefers-color-scheme: dark) {
     :root:not(.light) {
       --background: oklch(0.145 0 0);
+      --panel: 20 20 20 / 0.4;
       --foreground: oklch(0.985 0 0);
       --card: oklch(0.205 0 0);
       --card-foreground: oklch(0.985 0 0);
@@ -95,6 +97,7 @@
 
 @theme inline {
   --color-background: var(--background);
+  --color-panel: rgb(var(--panel));
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -134,8 +137,8 @@
   }
 
   *::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
+    width: 2px;
+    height: 2px;
   }
 
   *::-webkit-scrollbar-track {
