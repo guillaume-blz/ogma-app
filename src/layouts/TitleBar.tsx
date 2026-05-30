@@ -1,6 +1,6 @@
 import { type MouseEvent } from "react";
 import { X, Minus, Square, PanelRightOpen } from "lucide-react";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Kbd } from "@/components/ui/kbd";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useTranslation } from "react-i18next";
@@ -33,14 +33,17 @@ export function TitleBar() {
     >
       {!sidebarOpen && (
         <div className={`flex h-full shrink-0 items-center ${isMacOS ? "pl-[78px] pr-1" : "pl-1"}`}>
-          <Tooltip content={<>Toggle sidebar <Kbd>{formatDisplay(getKeys("toggle-sidebar") ?? "")}</Kbd></>} side="bottom">
-            <button
+          <Tooltip>
+            <TooltipTrigger
               onClick={toggleSidebar}
               className="flex items-center justify-center rounded p-1.5 text-titlebar-foreground/50 hover:text-titlebar-foreground hover:bg-sidebar-accent transition-colors"
               aria-label="Toggle sidebar"
             >
               <PanelRightOpen className="h-4 w-4 rotate-180" />
-            </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              Toggle sidebar <Kbd>{formatDisplay(getKeys("toggle-sidebar") ?? "")}</Kbd>
+            </TooltipContent>
           </Tooltip>
         </div>
       )}

@@ -44,6 +44,12 @@ export default {
     closeTab: "タブを閉じる",
     newTab: "新しいタブ",
     openSettings: "設定",
+    newSource: "新しいソース",
+  },
+  welcome: {
+    actions: {
+      newSource: "新しいソース",
+    },
   },
   settings: {
     title: "設定",

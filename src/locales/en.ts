@@ -44,6 +44,12 @@ export default {
     closeTab: "Close tab",
     newTab: "New tab",
     openSettings: "Settings",
+    newSource: "New source",
+  },
+  welcome: {
+    actions: {
+      newSource: "New source",
+    },
   },
   settings: {
     title: "Settings",

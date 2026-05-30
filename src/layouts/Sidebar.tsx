@@ -2,7 +2,7 @@ import type { ReactNode, MouseEvent, Ref } from "react";
 import { Panel } from "react-resizable-panels";
 import type { PanelImperativeHandle } from "react-resizable-panels";
 import { PanelRightClose } from "lucide-react";
-import { Tooltip } from "@/components/ui/tooltip";
+import { Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
 import { Kbd } from "@/components/ui/kbd";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getKeys, formatDisplay } from "@/shortcuts";
@@ -48,14 +48,17 @@ export function Sidebar({ children, panelRef, onCollapse, onExpand }: SidebarPro
         onMouseDown={onDragStart}
         className={`flex h-9 shrink-0 items-center select-none ${isMacOS ? "pl-[78px]" : "px-2"}`}
       >
-        <Tooltip content={<>Toggle sidebar <Kbd>{formatDisplay(getKeys("toggle-sidebar") ?? "")}</Kbd></>} side="right">
-          <button
+        <Tooltip>
+          <TooltipTrigger
             onClick={toggle}
             className="flex items-center justify-center rounded p-1.5 text-titlebar-foreground/50 hover:text-titlebar-foreground hover:bg-sidebar-accent transition-colors"
             aria-label="Close sidebar"
           >
             <PanelRightClose className="h-4 w-4 rotate-180" />
-          </button>
+          </TooltipTrigger>
+          <TooltipContent side="right">
+            Toggle sidebar <Kbd>{formatDisplay(getKeys("toggle-sidebar") ?? "")}</Kbd>
+          </TooltipContent>
         </Tooltip>
       </div>
       <div className="flex-1 min-h-0 overflow-hidden">

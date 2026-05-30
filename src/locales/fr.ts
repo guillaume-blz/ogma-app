@@ -44,6 +44,12 @@ export default {
     closeTab: "Fermer l'onglet",
     newTab: "Nouvel onglet",
     openSettings: "Paramètres",
+    newSource: "Nouvelle source",
+  },
+  welcome: {
+    actions: {
+      newSource: "Nouvelle source",
+    },
   },
   settings: {
     title: "Paramètres",

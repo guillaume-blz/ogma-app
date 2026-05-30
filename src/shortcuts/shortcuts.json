@@ -34,6 +34,13 @@
       "win": "Ctrl+B",
       "scope": "app",
       "labelKey": "shortcuts.toggleSidebar"
+    },
+    {
+      "id": "new-source",
+      "mac": "Cmd+Shift+S",
+      "win": "Ctrl+Shift+S",
+      "scope": "app",
+      "labelKey": "shortcuts.newSource"
     }
   ]
 }

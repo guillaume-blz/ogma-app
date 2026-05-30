@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { SourceTable } from "@/features/sources/components/SourceTable";
 import { SourceDrawer } from "@/features/sources/components/SourceDrawer";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
@@ -19,6 +19,14 @@ export function SourcesPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const navigate = useNavigate();
   const addTab = useTabStore((s) => s.addTab);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get("create") === "true") {
+      setDrawerOpen(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, []);
 
   const handleOpen = (source: Source) => {
     addTab({ id: `source-${source.id}`, path: `/sources/${source.id}`, label: source.name });
