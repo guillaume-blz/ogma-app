@@ -1,6 +1,7 @@
-import type { ReactNode, MouseEvent } from "react";
+import type { ReactNode, MouseEvent, Ref } from "react";
+import { Panel } from "react-resizable-panels";
+import type { ImperativePanelHandle } from "react-resizable-panels";
 import { PanelRightClose } from "lucide-react";
-import { ResizablePanel } from "@/components/ui/resizable";
 import { Tooltip } from "@/components/ui/tooltip";
 import { Kbd } from "@/components/ui/kbd";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -9,11 +10,14 @@ import { getKeys, formatDisplay } from "@/shortcuts";
 
 interface SidebarProps {
   children?: ReactNode;
+  panelRef?: Ref<ImperativePanelHandle>;
+  onCollapse?: () => void;
+  onExpand?: () => void;
 }
 
 const isMacOS = navigator.platform.toLowerCase().includes("mac");
 
-export function Sidebar({ children }: SidebarProps) {
+export function Sidebar({ children, panelRef, onCollapse, onExpand }: SidebarProps) {
   const appWindow = getCurrentWindow();
   const toggle = useSidebarStore((s) => s.toggle);
 
@@ -27,10 +31,16 @@ export function Sidebar({ children }: SidebarProps) {
   };
 
   return (
-    <ResizablePanel
-      defaultSize={20}
-      minSize={240}
-      maxSize={340}
+    <Panel
+      ref={panelRef}
+      defaultSize={240}
+      minSize={200}
+      maxSize={300}
+      collapsible
+      collapsedSize={0}
+      onCollapse={onCollapse}
+      onExpand={onExpand}
+      style={{ transition: "flex-basis 250ms ease-out" }}
       className="flex flex-col bg-transparent h-full overflow-hidden"
     >
       <div
@@ -51,6 +61,6 @@ export function Sidebar({ children }: SidebarProps) {
       <div className="flex-1 min-h-0 overflow-hidden">
         {children}
       </div>
-    </ResizablePanel>
+    </Panel>
   );
 }
